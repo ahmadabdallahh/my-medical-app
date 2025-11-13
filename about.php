@@ -152,7 +152,7 @@ require_once 'includes/functions.php';
                             <i class="fas fa-envelope"></i>
                             <div>
                                 <h4>البريد الإلكتروني</h4>
-                                <p>info@medical-booking.com</p>
+                                <p>healthh.tech404@gmail.com</p>
                             </div>
                         </div>
                         <div class="contact-item">

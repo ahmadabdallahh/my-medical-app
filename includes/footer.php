@@ -47,7 +47,7 @@
                     </li>
                     <li class="flex items-center justify-center md:justify-start">
                         <i class="fas fa-envelope ml-3"></i>
-                        <span>info@medical-booking.com</span>
+                        <span>healthh.tech404@gmail.com</span>
                     </li>
                 </ul>
             </div>

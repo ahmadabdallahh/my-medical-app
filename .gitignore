@@ -1,0 +1,201 @@
+# Medical Appointment Booking System - .gitignore
+
+# ============================================
+# Environment & Configuration Files
+# ============================================
+.env
+.env.local
+.env.*.local
+config.local.php
+config/database.local.php
+*.env
+
+# ============================================
+# PHP
+# ============================================
+# Composer
+/vendor/
+composer.phar
+composer.lock
+
+# PHPUnit
+/phpunit.xml
+.phpunit.result.cache
+
+# ============================================
+# IDE & Editor Files
+# ============================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PhpStorm / IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# ============================================
+# Operating System Files
+# ============================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+
+# ============================================
+# Logs & Temporary Files
+# ============================================
+*.log
+logs/
+*.tmp
+*.temp
+*.cache
+error_log
+access_log
+
+# ============================================
+# Database Files
+# ============================================
+*.sql.bak
+*.sql.backup
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================
+# Uploaded Files & User Content
+# ============================================
+uploads/
+uploaded_files/
+user_uploads/
+profile_images/
+hospital_images/
+clinic_images/
+doctor_images/
+appointment_files/
+*.jpg.bak
+*.png.bak
+*.jpeg.bak
+
+# Keep directory structure but ignore content
+!uploads/.gitkeep
+!uploaded_files/.gitkeep
+!profile_images/.gitkeep
+
+# ============================================
+# Session Files
+# ============================================
+sessions/
+tmp/
+temp/
+
+# ============================================
+# Backup Files
+# ============================================
+*.bak
+*.backup
+*.old
+*.orig
+backup/
+backups/
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+# ============================================
+# Node.js (if using npm/yarn for frontend)
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ============================================
+# Build & Distribution Files
+# ============================================
+dist/
+build/
+*.min.js
+*.min.css
+
+# ============================================
+# Testing
+# ============================================
+coverage/
+.phpunit.result.cache
+phpunit.xml
+
+# ============================================
+# Security & Sensitive Files
+# ============================================
+*.pem
+*.key
+*.cert
+*.crt
+secrets/
+private/
+*.secret
+
+# ============================================
+# Documentation Build
+# ============================================
+docs/_build/
+site/
+
+# ============================================
+# XAMPP Specific (if applicable)
+# ============================================
+xampp/
+htdocs/.htaccess.local
+
+# ============================================
+# Custom Project Files
+# ============================================
+# Admin creation scripts (after use)
+create_admin*.php
+check_and_fix_admin.php
+
+# Test files
+test_*.php
+*_test.php
+*_test.php.bak
+
+# Temporary SQL files
+temp_*.sql
+test_*.sql
+
+# ============================================
+# Keep Important Directories
+# ============================================
+!includes/
+!config/
+!admin/
+!patient/
+!.gitkeep
+

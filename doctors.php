@@ -121,7 +121,8 @@ $page_title = "أطباء " . htmlspecialchars($clinic['name']);
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
                     <div class="flex-1">
                         <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                            <?php echo htmlspecialchars($clinic['name']); ?></h1>
+                            <?php echo htmlspecialchars($clinic['name']); ?>
+                        </h1>
                         <div class="space-y-2 mb-4">
                             <p class="flex items-center text-gray-600">
                                 <i class="fas fa-hospital text-blue-600 ml-2"></i>
@@ -266,14 +267,16 @@ $page_title = "أطباء " . htmlspecialchars($clinic['name']);
                                                 المؤهلات العلمية
                                             </h4>
                                             <p class="text-sm text-gray-700 leading-relaxed">
-                                                <?php echo htmlspecialchars($doctor['education']); ?></p>
+                                                <?php echo htmlspecialchars($doctor['education']); ?>
+                                            </p>
                                         </div>
                                     <?php endif; ?>
 
                                     <?php if (isset($doctor['bio']) && $doctor['bio']): ?>
                                         <div class="mb-4">
                                             <p class="text-sm text-gray-600 leading-relaxed line-clamp-2">
-                                                <?php echo htmlspecialchars($doctor['bio']); ?></p>
+                                                <?php echo htmlspecialchars($doctor['bio']); ?>
+                                            </p>
                                         </div>
                                     <?php endif; ?>
 

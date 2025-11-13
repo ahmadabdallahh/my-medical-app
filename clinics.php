@@ -397,13 +397,13 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                         </li>
                         <li class="flex items-center justify-center md:justify-start gap-3">
                             <i class="fas fa-envelope text-blue-400"></i>
-                            <span>info@medical-booking.com</span>
+                            <span>healthh.tech404@gmail.com</span>
                         </li>
                     </ul>
                 </div>
             </div>
             <div class="border-t border-white/10 mt-10 pt-6 text-center text-gray-500 text-sm">
-                © <?php echo date('Y'); ?> Health Tech. جميع الحقوق محفوظة.
+                <?php echo date('Y'); ?> Health Tech. جميع الحقوق محفوظة.
             </div>
         </div>
     </footer>

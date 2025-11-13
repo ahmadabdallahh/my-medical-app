@@ -145,24 +145,35 @@ $completed_appointments = count(array_filter($appointments, function($app) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الملف الشخصي - موقع حجز المواعيد الطبية</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .profile-page {
-            padding-top: 80px;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
-            overflow-x: hidden;
-            overflow-y: visible;
-        }
+    <title>الملف الشخصي - Health Tech</title>
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts (Cairo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
         .profile-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 2rem 20px;
-            overflow: visible;
-            position: relative;
         }
 
         .page-header {
@@ -551,181 +562,199 @@ $completed_appointments = count(array_filter($appointments, function($app) {
         }
     </style>
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="nav-logo">
-                    <i class="fas fa-heartbeat"></i>
-                    <span>Health Tech</span>
-                </div>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="index.php" class="nav-link">الرئيسية</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="search.php" class="nav-link">البحث عن طبيب</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="dashboard.php" class="nav-link">لوحة التحكم</a>
-                    </li>
-                </ul>
-                <div class="nav-auth">
-                    <span class="user-name">مرحباً، <?php echo $user['full_name']; ?></span>
-                    <a href="logout.php" class="btn btn-outline">تسجيل الخروج</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+<body class="font-cairo bg-gray-50">
+
+    <?php require_once 'includes/header.php'; ?>
 
     <!-- Profile Page -->
-    <section class="profile-page">
-        <div class="profile-container">
+    <main class="bg-gray-50 py-12 min-h-screen">
+        <div class="container mx-auto px-4">
             <!-- Page Header -->
-            <div class="page-header">
-                <h1>الملف الشخصي</h1>
-                <p>إدارة بياناتك الشخصية وتفضيلاتك</p>
+            <div class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+                    <i class="fas fa-user-circle text-blue-600 ml-2"></i>
+                    الملف الشخصي
+                </h1>
+                <p class="text-lg text-gray-600">إدارة بياناتك الشخصية وتفضيلاتك</p>
             </div>
 
             <!-- Messages -->
             <?php if ($error): ?>
-                <div class="message error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span><?php echo $error; ?></span>
+                <div class="bg-red-100 border-r-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg max-w-4xl mx-auto">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle ml-2"></i>
+                        <span><?php echo htmlspecialchars($error); ?></span>
+                    </div>
                 </div>
             <?php endif; ?>
 
             <?php if ($success): ?>
-                <div class="message success">
-                    <i class="fas fa-check-circle"></i>
-                    <span><?php echo $success; ?></span>
+                <div class="bg-green-100 border-r-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg max-w-4xl mx-auto">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle ml-2"></i>
+                        <span><?php echo htmlspecialchars($success); ?></span>
+                    </div>
                 </div>
             <?php endif; ?>
 
-            <div class="profile-grid">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Profile Sidebar -->
-                <div class="profile-sidebar">
+                <div class="lg:col-span-1 bg-white rounded-2xl shadow-xl p-6 md:p-8">
                     <form action="profile.php" method="post" enctype="multipart/form-data" id="avatar-form">
-                        <div class="profile-avatar-wrapper">
-                            <img src="<?php echo BASE_URL . htmlspecialchars($user['profile_image']); ?>" alt="الصورة الشخصية" class="profile-avatar">
-                            <label for="profile_image_input" class="profile-avatar-upload">
-                                <i class="fas fa-camera"></i>
-                                <input type="file" name="profile_image" id="profile_image_input" accept="image/*">
+                        <div class="relative w-32 h-32 mx-auto mb-6">
+                            <?php
+                            $profile_image = isset($user['profile_image']) && !empty($user['profile_image']) ? $user['profile_image'] : '';
+                            $avatar_url = $profile_image && file_exists($profile_image)
+                                ? $profile_image
+                                : "https://ui-avatars.com/api/?name=" . urlencode($user['full_name']) . "&background=2563eb&color=fff&size=128&bold=true";
+                            ?>
+                            <img src="<?php echo htmlspecialchars($avatar_url); ?>"
+                                 alt="الصورة الشخصية"
+                                 class="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-lg"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($user['full_name']); ?>&background=2563eb&color=fff&size=128&bold=true'">
+                            <label for="profile_image_input" class="absolute bottom-0 right-0 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-all shadow-lg border-2 border-white">
+                                <i class="fas fa-camera text-sm"></i>
+                                <input type="file" name="profile_image" id="profile_image_input" accept="image/*" class="hidden">
                             </label>
                         </div>
                         <input type="submit" name="upload_image" id="upload_image_submit" style="display:none;">
                     </form>
 
-                    <h2 class="profile-name"><?php echo htmlspecialchars($user['full_name']); ?></h2>
-                    <p class="profile-email"><?php echo htmlspecialchars($user['email']); ?></p>
+                    <h2 class="text-2xl font-bold text-gray-900 text-center mb-2"><?php echo htmlspecialchars($user['full_name']); ?></h2>
+                    <p class="text-gray-600 text-center mb-6"><?php echo htmlspecialchars($user['email']); ?></p>
 
                     <!-- Profile Stats -->
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">إجمالي المواعيد</span>
-                            <span class="stat-value"><?php echo $total_appointments; ?></span>
+                    <div class="grid grid-cols-1 gap-3 mb-6">
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border-r-4 border-blue-500 hover:shadow-md transition-all">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 font-semibold flex items-center">
+                                    <i class="fas fa-calendar-check text-blue-600 ml-2"></i>
+                                    إجمالي المواعيد
+                                </span>
+                                <span class="text-2xl font-bold text-blue-600"><?php echo $total_appointments; ?></span>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">مواعيد قادمة</span>
-                            <span class="stat-value"><?php echo $upcoming_appointments; ?></span>
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border-r-4 border-green-500 hover:shadow-md transition-all">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 font-semibold flex items-center">
+                                    <i class="fas fa-calendar-alt text-green-600 ml-2"></i>
+                                    مواعيد قادمة
+                                </span>
+                                <span class="text-2xl font-bold text-green-600"><?php echo $upcoming_appointments; ?></span>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">مواعيد مكتملة</span>
-                            <span class="stat-value"><?php echo $completed_appointments; ?></span>
+                        <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border-r-4 border-purple-500 hover:shadow-md transition-all">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 font-semibold flex items-center">
+                                    <i class="fas fa-check-circle text-purple-600 ml-2"></i>
+                                    مواعيد مكتملة
+                                </span>
+                                <span class="text-2xl font-bold text-purple-600"><?php echo $completed_appointments; ?></span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Profile Actions -->
-                    <div class="profile-actions">
-                        <a href="dashboard.php" class="btn-profile btn-edit">
-                            <i class="fas fa-tachometer-alt"></i>
+                    <div class="space-y-3">
+                        <a href="dashboard.php" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-blue-700 transition-all duration-300 text-center block shadow-md hover:shadow-lg">
+                            <i class="fas fa-tachometer-alt ml-2"></i>
                             لوحة التحكم
                         </a>
-                        <a href="appointments.php" class="btn-profile btn-edit">
-                            <i class="fas fa-calendar-alt"></i>
+                        <a href="appointments.php" class="w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-green-700 transition-all duration-300 text-center block shadow-md hover:shadow-lg">
+                            <i class="fas fa-calendar-alt ml-2"></i>
                             مواعيدي
                         </a>
-                        <button class="btn-profile btn-danger" onclick="showDeleteAccountModal()">
-                            <i class="fas fa-trash"></i>
+                        <button onclick="showDeleteAccountModal()" class="w-full bg-red-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-red-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                            <i class="fas fa-trash ml-2"></i>
                             حذف الحساب
                         </button>
                     </div>
                 </div>
 
                 <!-- Profile Content -->
-                <div class="profile-content">
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 md:p-8">
                     <!-- Personal Information -->
-                    <div class="section-title">
-                        <i class="fas fa-user-edit"></i>
-                        البيانات الشخصية
+                    <div class="flex items-center gap-3 mb-6 pb-4 border-b-2 border-gray-200">
+                        <i class="fas fa-user-edit text-blue-600 text-2xl"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">البيانات الشخصية</h3>
                     </div>
 
                     <form method="POST" id="profile-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="username">اسم المستخدم</label>
-                                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" required>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="username" class="block text-sm font-semibold text-gray-700 mb-2">اسم المستخدم</label>
+                                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition-colors" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="email">البريد الإلكتروني</label>
-                                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
+                            <div>
+                                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">البريد الإلكتروني</label>
+                                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition-colors" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="full_name">الاسم الكامل *</label>
-                                <input type="text" id="full_name" name="full_name" value="<?php echo $user['full_name']; ?>" required>
+                            <div>
+                                <label for="full_name" class="block text-sm font-semibold text-gray-700 mb-2">الاسم الكامل *</label>
+                                <input type="text" id="full_name" name="full_name" value="<?php echo htmlspecialchars($user['full_name']); ?>"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition-colors" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="phone">رقم الهاتف *</label>
-                                <input type="tel" id="phone" name="phone" value="<?php echo $user['phone']; ?>" required>
+                            <div>
+                                <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">رقم الهاتف *</label>
+                                <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition-colors" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="date_of_birth">تاريخ الميلاد</label>
-                                <input type="date" id="date_of_birth" value="<?php echo $user['date_of_birth']; ?>" disabled>
+                            <div>
+                                <label for="date_of_birth" class="block text-sm font-semibold text-gray-700 mb-2">تاريخ الميلاد</label>
+                                <input type="date" id="date_of_birth" value="<?php echo htmlspecialchars($user['date_of_birth'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-100 cursor-not-allowed" disabled>
                             </div>
 
-                            <div class="form-group">
-                                <label for="gender">الجنس</label>
-                                <input type="text" id="gender" value="<?php echo $user['gender'] == 'male' ? 'ذكر' : 'أنثى'; ?>" disabled>
+                            <div>
+                                <label for="gender" class="block text-sm font-semibold text-gray-700 mb-2">الجنس</label>
+                                <input type="text" id="gender" value="<?php echo ($user['gender'] ?? '') == 'male' ? 'ذكر' : 'أنثى'; ?>"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-100 cursor-not-allowed" disabled>
                             </div>
                         </div>
 
                         <!-- Password Change Section -->
-                        <div class="password-section">
-                            <h3>
-                                <i class="fas fa-lock"></i>
-                                تغيير كلمة المرور
-                            </h3>
-                            <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+                        <div class="mt-8 pt-8 border-t-2 border-gray-200">
+                            <div class="flex items-center gap-3 mb-4">
+                                <i class="fas fa-lock text-blue-600 text-xl"></i>
+                                <h3 class="text-xl font-bold text-gray-900">تغيير كلمة المرور</h3>
+                            </div>
+                            <p class="text-gray-600 mb-6">
                                 اترك الحقول فارغة إذا كنت لا تريد تغيير كلمة المرور
                             </p>
 
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="current_password">كلمة المرور الحالية</label>
-                                    <input type="password" id="current_password" name="current_password" placeholder="أدخل كلمة المرور الحالية">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="current_password" class="block text-sm font-semibold text-gray-700 mb-2">كلمة المرور الحالية</label>
+                                    <input type="password" id="current_password" name="current_password" placeholder="أدخل كلمة المرور الحالية"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition-colors">
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="new_password">كلمة المرور الجديدة</label>
-                                    <input type="password" id="new_password" name="new_password" placeholder="أدخل كلمة المرور الجديدة">
+                                <div>
+                                    <label for="new_password" class="block text-sm font-semibold text-gray-700 mb-2">كلمة المرور الجديدة</label>
+                                    <input type="password" id="new_password" name="new_password" placeholder="أدخل كلمة المرور الجديدة"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition-colors">
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="confirm_password">تأكيد كلمة المرور الجديدة</label>
-                                    <input type="password" id="confirm_password" name="confirm_password" placeholder="أعد إدخال كلمة المرور الجديدة">
+                                <div class="md:col-span-2">
+                                    <label for="confirm_password" class="block text-sm font-semibold text-gray-700 mb-2">تأكيد كلمة المرور الجديدة</label>
+                                    <input type="password" id="confirm_password" name="confirm_password" placeholder="أعد إدخال كلمة المرور الجديدة"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition-colors">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Submit Section -->
-                        <div class="submit-section">
-                            <button type="submit" name="update_profile" class="btn-save" id="save-btn">
-                                <i class="fas fa-save"></i>
+                        <div class="mt-8 text-center">
+                            <button type="submit" name="update_profile"
+                                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 px-8 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                                    id="save-btn">
+                                <i class="fas fa-save ml-2"></i>
                                 حفظ التغييرات
                             </button>
                         </div>
@@ -734,28 +763,37 @@ $completed_appointments = count(array_filter($appointments, function($app) {
             </div>
 
             <!-- Account Information Card -->
-            <div class="info-card" style="margin-top: 3rem;">
-                <h4>
-                    <i class="fas fa-info-circle"></i>
-                    معلومات الحساب
-                </h4>
-                <div class="info-list">
-                    <div class="info-item">
-                        <span class="info-label">تاريخ إنشاء الحساب</span>
-                        <span class="info-value"><?php echo format_date_arabic($user['created_at']); ?></span>
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mt-8">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b-2 border-gray-200">
+                    <i class="fas fa-info-circle text-blue-600 text-2xl"></i>
+                    <h4 class="text-2xl font-bold text-gray-900">معلومات الحساب</h4>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors">
+                        <span class="text-gray-700 font-semibold flex items-center">
+                            <i class="fas fa-calendar-plus text-blue-600 ml-2"></i>
+                            تاريخ إنشاء الحساب
+                        </span>
+                        <span class="text-gray-900 font-bold"><?php echo isset($user['created_at']) ? date('d/m/Y', strtotime($user['created_at'])) : 'غير متوفر'; ?></span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">آخر تحديث</span>
-                        <span class="info-value"><?php echo format_date_arabic($user['updated_at']); ?></span>
+                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors">
+                        <span class="text-gray-700 font-semibold flex items-center">
+                            <i class="fas fa-sync-alt text-blue-600 ml-2"></i>
+                            آخر تحديث
+                        </span>
+                        <span class="text-gray-900 font-bold"><?php echo isset($user['updated_at']) ? date('d/m/Y', strtotime($user['updated_at'])) : 'غير متوفر'; ?></span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">حالة الحساب</span>
-                        <span class="info-value" style="color: var(--success);">نشط</span>
+                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-green-50 transition-colors">
+                        <span class="text-gray-700 font-semibold flex items-center">
+                            <i class="fas fa-check-circle text-green-600 ml-2"></i>
+                            حالة الحساب
+                        </span>
+                        <span class="text-green-600 font-bold">نشط</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </main>
 
     <!-- Delete Account Modal -->
     <div class="modal" id="delete-account-modal">
@@ -777,7 +815,8 @@ $completed_appointments = count(array_filter($appointments, function($app) {
         </div>
     </div>
 
-    <script src="assets/js/script.js"></script>
+    <?php require_once 'includes/footer.php'; ?>
+
     <script>
         // Form Validation
         document.addEventListener('DOMContentLoaded', function() {
