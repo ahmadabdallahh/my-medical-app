@@ -36,8 +36,9 @@ if (isset($_SESSION['user_id'])) {
 
 // Determine base URL for images
 $script_path = $_SERVER['SCRIPT_NAME'] ?? '';
-$is_admin = strpos($script_path, '/admin/') !== false;
-$base_path = $is_admin ? '../' : '';
+// Determine if we're in a subdirectory and need relative path adjustment
+$is_subdir = preg_match('#/(doctor|admin|hospital|patient)/#', $script_path);
+$base_path = $is_subdir ? '../' : '';
 
 // If no profile image, use default or generate from name
 if (empty($profile_image)) {
@@ -58,7 +59,7 @@ if (empty($profile_image)) {
                 </button>
 
                 <!-- Logo/Title for mobile -->
-                <a href="index.php" class="lg:hidden ml-3 text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                <a href="<?php echo $base_path; ?>index.php" class="lg:hidden ml-3 text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
                     Health Tech
                 </a>
             </div>
@@ -118,12 +119,10 @@ if (empty($profile_image)) {
                         style="display: none;"
                     >
                         <?php
-                        // Determine the correct path based on current directory
-                        $script_path = $_SERVER['SCRIPT_NAME'] ?? '';
-                        $is_admin = strpos($script_path, '/admin/') !== false;
-                        $profile_link = $is_admin ? 'profile.php' : '../admin/profile.php';
-                        $home_link = $is_admin ? '../index.php' : '../../index.php';
-                        $logout_link = $is_admin ? '../logout.php' : '../../logout.php';
+                        // Use the consistent base_path logic
+                        $profile_link = $base_path . 'profile.php';
+                        $home_link = $base_path . 'index.php';
+                        $logout_link = $base_path . 'logout.php';
                         ?>
                         <a href="<?php echo $profile_link; ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-user ml-2"></i>الملف الشخصي

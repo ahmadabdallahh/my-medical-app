@@ -14,22 +14,30 @@ if (!is_logged_in() || $_SESSION['user_type'] !== 'doctor') {
 $db = new Database();
 $conn = $db->getConnection();
 
-$doctor_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
 $doctor_name = $_SESSION['user_name'] ?? 'Doctor';
 
 $pageTitle = "لوحة تحكم الدكتور - Health Tech";
 
-// Get doctor's basic info
+// Get doctor's basic info and doctor_id (doctors.id, not users.id)
+$doctor_id = null;
 try {
     $stmt = $conn->prepare("SELECT * FROM doctors WHERE user_id = ?");
-    $stmt->execute([$doctor_id]);
+    $stmt->execute([$user_id]);
     $doctor_info = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if ($doctor_info) {
         $doctor_name = $doctor_info['full_name'];
+        $doctor_id = $doctor_info['id']; // This is doctors.id, used in appointments table
     }
 } catch (PDOException $e) {
     error_log("Doctor info error: " . $e->getMessage());
+}
+
+// If doctor_id not found, redirect
+if (!$doctor_id) {
+    header('Location: /App-Demo/login.php?error=doctor_not_found');
+    exit();
 }
 
 // Get today's appointments count
@@ -62,11 +70,11 @@ try {
 // Get recent appointments
 try {
     $stmt = $conn->prepare("
-        SELECT a.*, u.full_name as patient_name 
-        FROM appointments a 
-        LEFT JOIN users u ON a.user_id = u.id 
-        WHERE a.doctor_id = ? 
-        ORDER BY a.appointment_date DESC, a.appointment_time DESC 
+        SELECT a.*, u.full_name as patient_name
+        FROM appointments a
+        LEFT JOIN users u ON a.user_id = u.id
+        WHERE a.doctor_id = ?
+        ORDER BY a.appointment_date DESC, a.appointment_time DESC
         LIMIT 5
     ");
     $stmt->execute([$doctor_id]);
@@ -78,28 +86,30 @@ try {
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?></title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts (Cairo) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         body {
             font-family: 'Cairo', sans-serif;
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
 
     <!-- Navigation -->
@@ -107,21 +117,21 @@ try {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/App-Demo/index.php" class="flex items-center">
+                    <a href="../index.php" class="flex items-center">
                         <i class="fas fa-heartbeat text-blue-600 text-2xl ml-2"></i>
                         <span class="text-xl font-bold text-gray-800">Health Tech</span>
                     </a>
                 </div>
-                
+
                 <div class="flex items-center space-x-4 space-x-reverse">
                     <span class="text-gray-600">
                         <i class="fas fa-user-md text-blue-600 ml-2"></i>
                         د. <?php echo htmlspecialchars($doctor_name); ?>
                     </span>
-                    <a href="/App-Demo/profile.php" class="text-gray-600 hover:text-blue-600 transition-colors">
+                    <a href="../profile.php" class="text-gray-600 hover:text-blue-600 transition-colors">
                         <i class="fas fa-user text-lg"></i>
                     </a>
-                    <a href="/App-Demo/logout.php" class="text-gray-600 hover:text-red-600 transition-colors">
+                    <a href="../logout.php" class="text-gray-600 hover:text-red-600 transition-colors">
                         <i class="fas fa-sign-out-alt text-lg"></i>
                     </a>
                 </div>
@@ -135,39 +145,46 @@ try {
         <aside class="w-64 bg-white shadow-lg min-h-screen">
             <div class="p-4">
                 <h3 class="text-lg font-bold text-gray-800 mb-6">لوحة التحكم</h3>
-                
+
                 <nav class="space-y-2">
-                    <a href="/App-Demo/doctor/index.php" class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                    <a href="index.php"
+                        class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                         <i class="fas fa-home ml-3"></i>
                         الرئيسية
                     </a>
-                    
-                    <a href="/App-Demo/doctor/appointments.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+
+                    <a href="appointments.php"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-calendar-check ml-3"></i>
                         المواعيد
                     </a>
-                    
-                    <a href="/App-Demo/doctor/profile.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+
+                    <a href="profile.php"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-user-circle ml-3"></i>
                         الملف الشخصي
                     </a>
-                    
-                    <a href="/App-Demo/doctor/availability.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+
+                    <a href="availability.php"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-clock ml-3"></i>
                         مواعيد العمل
                     </a>
-                    
-                    <a href="/App-Demo/search.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+
+                    <a href="../search.php"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-search ml-3"></i>
                         البحث عن أطباء
                     </a>
-                    
-                    <a href="/App-Demo/hospitals.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+
+                    <a href="../hospitals.php"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-hospital ml-3"></i>
                         المستشفيات
                     </a>
-                    
-                    <a href="/App-Demo/index.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+
+                    <a href="../index.php"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-globe ml-3"></i>
                         الموقع الرئيسي
                     </a>
@@ -179,7 +196,8 @@ try {
         <main class="flex-1 p-8">
             <!-- Welcome Header -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">أهلاً بك، د. <?php echo htmlspecialchars($doctor_name); ?></h1>
+                <h1 class="text-3xl font-bold text-gray-900">أهلاً بك، د. <?php echo htmlspecialchars($doctor_name); ?>
+                </h1>
                 <p class="text-gray-600 mt-2">هذا هو ملخص نشاطك اليومي</p>
             </div>
 
@@ -229,7 +247,9 @@ try {
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">التقييم</p>
-                            <p class="text-2xl font-bold text-gray-900"><?php echo $doctor_info ? number_format($doctor_info['rating'], 1) : '0.0'; ?> ⭐</p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                <?php echo $doctor_info ? number_format($doctor_info['rating'], 1) : '0.0'; ?> ⭐
+                            </p>
                         </div>
                         <div class="bg-yellow-100 p-3 rounded-full">
                             <i class="fas fa-star text-yellow-600 text-xl"></i>
@@ -241,7 +261,7 @@ try {
             <!-- Recent Appointments -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-4">آخر المواعيد</h2>
-                
+
                 <?php if (!empty($recent_appointments)): ?>
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -256,11 +276,14 @@ try {
                             <tbody>
                                 <?php foreach ($recent_appointments as $appointment): ?>
                                     <tr class="border-b hover:bg-gray-50">
-                                        <td class="py-3 px-4"><?php echo htmlspecialchars($appointment['patient_name'] ?? 'غير محدد'); ?></td>
+                                        <td class="py-3 px-4">
+                                            <?php echo htmlspecialchars($appointment['patient_name'] ?? 'غير محدد'); ?>
+                                        </td>
                                         <td class="py-3 px-4"><?php echo $appointment['appointment_date']; ?></td>
                                         <td class="py-3 px-4"><?php echo $appointment['appointment_time']; ?></td>
                                         <td class="py-3 px-4">
-                                            <span class="px-2 py-1 text-xs rounded-full <?php echo $appointment['status'] == 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full <?php echo $appointment['status'] == 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
                                                 <?php echo $appointment['status'] == 'confirmed' ? 'مؤكد' : 'ملغي'; ?>
                                             </span>
                                         </td>
@@ -275,9 +298,10 @@ try {
                         <p>لا توجد مواعيد حالياً</p>
                     </div>
                 <?php endif; ?>
-                
+
                 <div class="mt-6 text-center">
-                    <a href="/App-Demo/doctor/appointments.php" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <a href="appointments.php"
+                        class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                         <i class="fas fa-list ml-2"></i>
                         عرض جميع المواعيد
                     </a>
@@ -286,19 +310,22 @@ try {
 
             <!-- Quick Actions -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                <a href="/App-Demo/doctor/availability.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
+                <a href="availability.php"
+                    class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
                     <i class="fas fa-clock text-blue-600 text-3xl mb-3"></i>
                     <h3 class="font-semibold text-gray-900">إدارة مواعيد العمل</h3>
                     <p class="text-gray-600 text-sm mt-2">حدد أوقات توافرك</p>
                 </a>
-                
-                <a href="/App-Demo/doctor/profile.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
+
+                <a href="profile.php"
+                    class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
                     <i class="fas fa-user-edit text-blue-600 text-3xl mb-3"></i>
                     <h3 class="font-semibold text-gray-900">تعديل الملف الشخصي</h3>
                     <p class="text-gray-600 text-sm mt-2">حدث بياناتك ومعلوماتك</p>
                 </a>
-                
-                <a href="/App-Demo/search.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
+
+                <a href="../search.php"
+                    class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
                     <i class="fas fa-search text-blue-600 text-3xl mb-3"></i>
                     <h3 class="font-semibold text-gray-900">البحث عن زملاء</h3>
                     <p class="text-gray-600 text-sm mt-2">ابحث عن أطباء آخرين</p>
@@ -308,4 +335,5 @@ try {
     </div>
 
 </body>
+
 </html>

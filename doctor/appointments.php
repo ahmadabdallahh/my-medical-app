@@ -6,7 +6,7 @@ require_once '../includes/functions.php';
 
 // Ensure user is logged in as a doctor
 if (!is_logged_in() || $_SESSION['user_type'] !== 'doctor') {
-    header('Location: /App-Demo/login.php');
+    header('Location: ../login.php');
     exit();
 }
 
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/App-Demo/index.php" class="flex items-center">
+                    <a href="../index.php" class="flex items-center">
                         <i class="fas fa-heartbeat text-blue-600 text-2xl ml-2"></i>
                         <span class="text-xl font-bold text-gray-800">Health Tech</span>
                     </a>
@@ -122,10 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                         <i class="fas fa-user-md text-blue-600 ml-2"></i>
                         د. <?php echo htmlspecialchars($doctor_name); ?>
                     </span>
-                    <a href="/App-Demo/profile.php" class="text-gray-600 hover:text-blue-600 transition-colors">
+                    <a href="../profile.php" class="text-gray-600 hover:text-blue-600 transition-colors">
                         <i class="fas fa-user text-lg"></i>
                     </a>
-                    <a href="/App-Demo/logout.php" class="text-gray-600 hover:text-red-600 transition-colors">
+                    <a href="../logout.php" class="text-gray-600 hover:text-red-600 transition-colors">
                         <i class="fas fa-sign-out-alt text-lg"></i>
                     </a>
                 </div>
@@ -141,32 +141,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                 <h3 class="text-lg font-bold text-gray-800 mb-6">لوحة التحكم</h3>
                 
                 <nav class="space-y-2">
-                    <a href="/App-Demo/doctor/index.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                    <a href="index.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-home ml-3"></i>
                         الرئيسية
                     </a>
                     
-                    <a href="/App-Demo/doctor/appointments.php" class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                    <a href="appointments.php" class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                         <i class="fas fa-calendar-check ml-3"></i>
                         المواعيد
                     </a>
                     
-                    <a href="/App-Demo/doctor/profile.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                    <a href="profile.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-user-circle ml-3"></i>
                         الملف الشخصي
                     </a>
                     
-                    <a href="/App-Demo/doctor/availability.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                    <a href="availability.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-clock ml-3"></i>
                         مواعيد العمل
                     </a>
                     
-                    <a href="/App-Demo/search.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                    <a href="../search.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-search ml-3"></i>
                         البحث عن أطباء
                     </a>
                     
-                    <a href="/App-Demo/index.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                    <a href="../index.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-globe ml-3"></i>
                         الموقع الرئيسي
                     </a>

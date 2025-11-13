@@ -13,8 +13,9 @@ if (!function_exists('is_logged_in')) {
 }
 
 $script_path = $_SERVER['SCRIPT_NAME'] ?? '';
-$is_patient_section = strpos($script_path, '/patient/') !== false;
-$base_path = $is_patient_section ? '../' : '';
+// Determine if we're in a subdirectory and need relative path adjustment
+$is_subdir = preg_match('#/(doctor|admin|hospital|patient)/#', $script_path);
+$base_path = $is_subdir ? '../' : '';
 ?>
 
 <!-- AlpineJS for mobile menu interactivity -->

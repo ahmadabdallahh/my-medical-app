@@ -23,19 +23,27 @@ $conn = $db->getConnection();
 // Fetch doctor details
 $doctor = get_doctor_by_id($doctor_id);
 
-// Get rating statistics
-$rating_stats = get_doctor_rating_stats($conn, $doctor_id);
+if (!$doctor) {
+    header('Location: search.php');
+    exit();
+}
 
-// Get recent ratings
-$recent_ratings = get_doctor_ratings($conn, $doctor_id, 5);
+// Get doctor's user_id (used in doctor_ratings table)
+$doctor_user_id = $doctor['user_id'] ?? $doctor_id;
 
-// Check if current user can rate
+// Get rating statistics (use user_id, not doctor id)
+$rating_stats = get_doctor_rating_stats($conn, $doctor_user_id);
+
+// Get recent ratings (use user_id, not doctor id)
+$recent_ratings = get_doctor_ratings($conn, $doctor_user_id, 5);
+
+// Check if current user can rate (use user_id, not doctor id)
 $can_rate = ['can_rate' => false, 'reason' => ''];
 $user_rating = null;
 if (is_logged_in()) {
     $user_id = $_SESSION['user_id'];
-    $can_rate = can_user_rate_doctor($conn, $user_id, $doctor_id);
-    $user_rating = get_user_rating_for_doctor($conn, $user_id, $doctor_id);
+    $can_rate = can_user_rate_doctor($conn, $user_id, $doctor_user_id);
+    $user_rating = get_user_rating_for_doctor($conn, $user_id, $doctor_user_id);
 }
 
 // Handle rating submission
@@ -46,20 +54,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_rating'])) {
     if (!is_logged_in()) {
         $error_message = 'يجب تسجيل الدخول لإضافة تقييم';
     } else {
+        // Make sure doctor_user_id is available
+        if (!isset($doctor_user_id)) {
+            $doctor_user_id = $doctor['user_id'] ?? $doctor_id;
+        }
+
         $user_id = $_SESSION['user_id'];
         $rating = (int)$_POST['rating'];
         $review = sanitize_input($_POST['review']);
         $is_anonymous = isset($_POST['anonymous']) ? 1 : 0;
-        
-        $result = submit_doctor_rating($conn, $doctor_id, $user_id, $rating, $review, $is_anonymous);
-        
+
+        $result = submit_doctor_rating($conn, $doctor_user_id, $user_id, $rating, $review, $is_anonymous);
+
         if ($result['success']) {
             $success_message = $result['message'];
             // Refresh data
-            $rating_stats = get_doctor_rating_stats($conn, $doctor_id);
-            $recent_ratings = get_doctor_ratings($conn, $doctor_id, 5);
-            $can_rate = can_user_rate_doctor($conn, $user_id, $doctor_id);
-            $user_rating = get_user_rating_for_doctor($conn, $user_id, $doctor_id);
+            $rating_stats = get_doctor_rating_stats($conn, $doctor_user_id);
+            $recent_ratings = get_doctor_ratings($conn, $doctor_user_id, 5);
+            $can_rate = can_user_rate_doctor($conn, $user_id, $doctor_user_id);
+            $user_rating = get_user_rating_for_doctor($conn, $user_id, $doctor_user_id);
         } else {
             $error_message = $result['message'];
         }
@@ -137,7 +150,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                     $avg_rating = $rating_stats['average_rating'] ?: 0;
                     $full_stars = floor($avg_rating);
                     $has_half_star = ($avg_rating - $full_stars) >= 0.5;
-                    
+
                     for ($i = 1; $i <= 5; $i++) {
                         if ($i <= $full_stars) {
                             echo '<i class="fas fa-star"></i>';
@@ -225,7 +238,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                             $avg_rating = $rating_stats['average_rating'] ?: 0;
                             $full_stars = floor($avg_rating);
                             $has_half_star = ($avg_rating - $full_stars) >= 0.5;
-                            
+
                             for ($i = 1; $i <= 5; $i++) {
                                 if ($i <= $full_stars) {
                                     echo '<i class="fas fa-star text-yellow-400 text-xl"></i>';
@@ -249,7 +262,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                         <?php echo $success_message; ?>
                     </div>
                 <?php endif; ?>
-                
+
                 <?php if ($error_message): ?>
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
                         <i class="fas fa-exclamation-circle ml-2"></i>
@@ -263,7 +276,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">
                             <?php echo $user_rating ? 'تقييمك الحالي' : 'أضف تقييمك'; ?>
                         </h3>
-                        
+
                         <?php if (!is_logged_in()): ?>
                             <div class="bg-gray-50 p-6 rounded-lg text-center">
                                 <i class="fas fa-user-circle text-gray-400 text-4xl mb-3"></i>
@@ -297,13 +310,13 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                             <?php else: ?>
                                 <form method="POST" action="" class="space-y-4">
                                     <input type="hidden" name="submit_rating" value="1">
-                                    
+
                                     <!-- Rating Stars -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">التقييم</label>
                                         <div class="flex gap-1" id="rating-stars">
                                             <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                <button type="button" 
+                                                <button type="button"
                                                         class="star-btn text-3xl text-gray-300 hover:text-yellow-400 transition-colors"
                                                         data-rating="<?php echo $i; ?>"
                                                         onclick="setRating(<?php echo $i; ?>)">
@@ -313,22 +326,22 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                                         </div>
                                         <input type="hidden" name="rating" id="rating-value" value="5" required>
                                     </div>
-                                    
+
                                     <!-- Review Text -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">تعليق (اختياري)</label>
-                                        <textarea name="review" rows="4" 
+                                        <textarea name="review" rows="4"
                                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                   placeholder="شاركنا رأيك في تجربتك مع الدكتور..."></textarea>
                                     </div>
-                                    
+
                                     <!-- Anonymous Option -->
                                     <div class="flex items-center">
                                         <input type="checkbox" name="anonymous" id="anonymous" class="ml-2">
                                         <label for="anonymous" class="text-sm text-gray-700">نشر التقييم بشكل مجهول</label>
                                     </div>
-                                    
-                                    <button type="submit" 
+
+                                    <button type="submit"
                                             class="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                                         <i class="fas fa-star ml-2"></i>
                                         إضافة التقييم
@@ -341,7 +354,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                     <!-- Reviews List -->
                     <div>
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">آخر التقييمات</h3>
-                        
+
                         <?php if (empty($recent_ratings)): ?>
                             <div class="text-center py-8 text-gray-500">
                                 <i class="fas fa-comments text-4xl mb-3"></i>
@@ -372,7 +385,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                                                 <?php echo date('Y/m/d', strtotime($rating['created_at'])); ?>
                                             </span>
                                         </div>
-                                        
+
                                         <?php if ($rating['review']): ?>
                                             <p class="text-gray-700 pr-11"><?php echo htmlspecialchars($rating['review']); ?></p>
                                         <?php endif; ?>
@@ -396,7 +409,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
                                 elseif ($star == 3) $count = $rating_stats['three_star'];
                                 elseif ($star == 2) $count = $rating_stats['two_star'];
                                 elseif ($star == 1) $count = $rating_stats['one_star'];
-                                
+
                                 $percentage = $rating_stats['total_ratings'] > 0 ? ($count / $rating_stats['total_ratings']) * 100 : 0;
                             ?>
                                 <div class="flex items-center gap-3">
@@ -423,7 +436,7 @@ $pageTitle = $doctor ? 'ملف الطبيب: ' . htmlspecialchars($doctor['full_
 function setRating(rating) {
     // Update hidden input
     document.getElementById('rating-value').value = rating;
-    
+
     // Update star display
     const stars = document.querySelectorAll('.star-btn i');
     stars.forEach((star, index) => {

@@ -332,27 +332,12 @@ function validate_email_enhanced($email)
 // Enhanced password validation
 function validate_password_enhanced($password)
 {
-    if (strlen($password) < 8) {
-        return ['success' => false, 'message' => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل'];
+    // متطلبات بسيطة: فقط 6 أحرف على الأقل
+    if (strlen($password) < 6) {
+        return ['success' => false, 'message' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'];
     }
 
-    if (!preg_match('/[A-Z]/', $password)) {
-        return ['success' => false, 'message' => 'يجب أن تحتوي على حرف كبير'];
-    }
-
-    if (!preg_match('/[a-z]/', $password)) {
-        return ['success' => false, 'message' => 'يجب أن تحتوي على حرف صغير'];
-    }
-
-    if (!preg_match('/[0-9]/', $password)) {
-        return ['success' => false, 'message' => 'يجب أن تحتوي على رقم'];
-    }
-
-    if (!preg_match('/[@$!%*?&]/', $password)) {
-        return ['success' => false, 'message' => 'يجب أن تحتوي على رمز خاص'];
-    }
-
-    return ['success' => true, 'message' => 'كلمة المرور قوية'];
+    return ['success' => true, 'message' => 'كلمة المرور صحيحة'];
 }
 
 
@@ -879,7 +864,7 @@ function get_doctor_by_id($doctor_id)
     }
 
     $sql = "SELECT
-                d.id, d.full_name, d.email, d.phone, d.bio, d.image, d.rating, d.specialty_id, d.clinic_id, d.is_active,
+                d.id, d.user_id, d.full_name, d.email, d.phone, d.bio, d.image, d.rating, d.specialty_id, d.clinic_id, d.is_active,
                 d.consultation_fee,
                 s.name as specialty_name,
                 c.name as clinic_name,
@@ -1416,8 +1401,8 @@ function get_all_doctors_with_details($pdo)
                 d.rating,
                 d.consultation_fee,
                 CASE
-                    WHEN d.is_active = 1 THEN 'approved'
                     WHEN d.id IS NULL THEN 'pending'
+                    WHEN d.is_active = 1 THEN 'approved'
                     ELSE 'suspended'
                 END as status
             FROM users u

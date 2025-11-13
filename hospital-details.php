@@ -27,12 +27,12 @@ try {
     $stmt = $conn->prepare("SELECT * FROM hospitals WHERE id = ?");
     $stmt->execute([$hospital_id]);
     $hospital = $stmt->fetch();
-    
+
     if (!$hospital) {
         header("Location: hospitals.php");
         exit();
     }
-    
+
     // Get clinics
     $stmt = $conn->prepare("
         SELECT c.*, s.name as specialty_name, COUNT(d.id) as doctors_count
@@ -45,7 +45,7 @@ try {
     ");
     $stmt->execute([$hospital_id]);
     $clinics = $stmt->fetchAll();
-    
+
     // Get doctors
     $stmt = $conn->prepare("
         SELECT d.*, s.name as specialty_name, c.name as clinic_name
@@ -57,7 +57,7 @@ try {
     ");
     $stmt->execute([$hospital_id]);
     $doctors = $stmt->fetchAll();
-    
+
 } catch (PDOException $e) {
     header("Location: hospitals.php");
     exit();
@@ -70,27 +70,27 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($hospital['name']); ?> - Health Tech</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts (Cairo) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         body {
             font-family: 'Cairo', sans-serif;
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
@@ -108,7 +108,7 @@ try {
                         <span class="text-xl font-bold text-gray-800">Health Tech</span>
                     </a>
                 </div>
-                
+
                 <div class="flex items-center space-x-4 space-x-reverse">
                     <a href="hospitals.php" class="text-gray-600 hover:text-blue-600 transition-colors">
                         <i class="fas fa-arrow-left text-lg"></i>
@@ -130,14 +130,28 @@ try {
     <!-- Main Content -->
     <div class="min-h-screen pt-20 pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
+
             <!-- Hospital Hero Section -->
             <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
                 <!-- Hero Image -->
-                <div class="h-64 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                    <i class="fas fa-hospital text-white text-6xl"></i>
+                <?php
+                $hospital_image = get_hospital_display_image($hospital);
+                $default_hospital_image = get_default_hospital_image();
+
+                // Add BASE_URL if the image is a local path (not a full URL)
+                if (!preg_match('/^https?:\/\//', $hospital_image)) {
+                    $hospital_image = BASE_URL . ltrim($hospital_image, '/');
+                }
+                ?>
+                <div class="relative h-64 md:h-80 overflow-hidden">
+                    <img src="<?php echo htmlspecialchars($hospital_image); ?>"
+                         alt="صورة <?php echo htmlspecialchars($hospital['name']); ?>"
+                         class="w-full h-full object-cover"
+                         onerror="this.onerror=null;this.src='<?php echo htmlspecialchars($default_hospital_image); ?>';"
+                         loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 </div>
-                
+
                 <!-- Hospital Content -->
                 <div class="p-8">
                     <!-- Header -->
@@ -150,7 +164,7 @@ try {
                                 <?php echo htmlspecialchars($hospital['type']); ?>
                             </span>
                         </div>
-                        
+
                         <!-- Rating -->
                         <div class="bg-gray-50 p-4 rounded-xl text-center min-w-[200px]">
                             <div class="flex text-yellow-400 justify-center mb-2">
@@ -171,12 +185,12 @@ try {
                             <p class="text-sm text-gray-600">تقييم</p>
                         </div>
                     </div>
-                    
+
                     <!-- Description -->
                     <p class="text-gray-600 text-lg leading-relaxed mb-8">
                         <?php echo htmlspecialchars($hospital['description']); ?>
                     </p>
-                    
+
                     <!-- Info Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <div class="bg-gray-50 p-6 rounded-xl">
@@ -186,7 +200,7 @@ try {
                             <h4 class="font-semibold text-gray-900 mb-2">العنوان</h4>
                             <p class="text-gray-700"><?php echo htmlspecialchars($hospital['address']); ?></p>
                         </div>
-                        
+
                         <div class="bg-gray-50 p-6 rounded-xl">
                             <div class="flex items-center text-blue-600 mb-3">
                                 <i class="fas fa-phone text-xl"></i>
@@ -194,7 +208,7 @@ try {
                             <h4 class="font-semibold text-gray-900 mb-2">الهاتف</h4>
                             <p class="text-gray-700"><?php echo htmlspecialchars($hospital['phone']); ?></p>
                         </div>
-                        
+
                         <div class="bg-gray-50 p-6 rounded-xl">
                             <div class="flex items-center text-blue-600 mb-3">
                                 <i class="fas fa-envelope text-xl"></i>
@@ -202,7 +216,7 @@ try {
                             <h4 class="font-semibold text-gray-900 mb-2">البريد الإلكتروني</h4>
                             <p class="text-gray-700"><?php echo htmlspecialchars($hospital['email']); ?></p>
                         </div>
-                        
+
                         <div class="bg-gray-50 p-6 rounded-xl">
                             <div class="flex items-center text-blue-600 mb-3">
                                 <i class="fas fa-clock text-xl"></i>
@@ -211,7 +225,7 @@ try {
                             <p class="text-gray-700"><?php echo $hospital['is_24h'] ? 'مفتوح 24 ساعة' : 'ساعات عمل محددة'; ?></p>
                         </div>
                     </div>
-                    
+
                     <!-- Features -->
                     <div class="flex flex-wrap gap-3">
                         <?php if ($hospital['is_24h']): ?>
@@ -245,14 +259,14 @@ try {
             <!-- Tabs Section -->
             <div class="bg-white rounded-2xl shadow-xl p-2 mb-8">
                 <div class="flex flex-col sm:flex-row">
-                    <button onclick="showTab('clinics')" 
-                            class="tab-btn flex-1 px-6 py-3 text-center font-medium rounded-xl transition-all duration-200 bg-blue-600 text-white" 
+                    <button onclick="showTab('clinics')"
+                            class="tab-btn flex-1 px-6 py-3 text-center font-medium rounded-xl transition-all duration-200 bg-blue-600 text-white"
                             data-tab="clinics">
                         <i class="fas fa-stethoscope ml-2"></i>
                         العيادات (<?php echo count($clinics); ?>)
                     </button>
-                    <button onclick="showTab('doctors')" 
-                            class="tab-btn flex-1 px-6 py-3 text-center font-medium rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-100" 
+                    <button onclick="showTab('doctors')"
+                            class="tab-btn flex-1 px-6 py-3 text-center font-medium rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-100"
                             data-tab="doctors">
                         <i class="fas fa-user-md ml-2"></i>
                         الأطباء (<?php echo count($doctors); ?>)
@@ -288,12 +302,12 @@ try {
                                         <?php echo $clinic['consultation_fee']; ?> ج.م
                                     </div>
                                 </div>
-                                
+
                                 <!-- Description -->
                                 <p class="text-gray-600 mb-4 line-clamp-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
                                     <?php echo htmlspecialchars($clinic['description']); ?>
                                 </p>
-                                
+
                                 <!-- Stats -->
                                 <div class="flex justify-between mb-6 p-4 bg-gray-50 rounded-lg">
                                     <div class="text-center">
@@ -305,15 +319,15 @@ try {
                                         <div class="text-sm text-gray-600">ج.م للكشف</div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Actions -->
                                 <div class="flex space-x-3 space-x-reverse">
-                                    <a href="book.php?clinic=<?php echo $clinic['id']; ?>" 
+                                    <a href="book.php?clinic=<?php echo $clinic['id']; ?>"
                                        class="flex-1 text-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
                                         <i class="fas fa-calendar-plus ml-1"></i>
                                         حجز موعد
                                     </a>
-                                    <a href="doctors.php?clinic=<?php echo $clinic['id']; ?>" 
+                                    <a href="doctors.php?clinic=<?php echo $clinic['id']; ?>"
                                        class="flex-1 text-center px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors">
                                         <i class="fas fa-user-md ml-1"></i>
                                         الأطباء
@@ -353,7 +367,7 @@ try {
                                         </p>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Rating -->
                                 <div class="flex items-center mb-4">
                                     <div class="flex text-yellow-400 ml-2">
@@ -372,7 +386,7 @@ try {
                                     </div>
                                     <span class="text-sm font-medium text-gray-600"><?php echo number_format($rating, 1); ?></span>
                                 </div>
-                                
+
                                 <!-- Details -->
                                 <div class="space-y-2 mb-4">
                                     <div class="flex items-center text-sm text-gray-600">
@@ -388,15 +402,15 @@ try {
                                         <span><?php echo $doctor['consultation_fee']; ?> ج.م للكشف</span>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Actions -->
                                 <div class="flex space-x-3 space-x-reverse">
-                                    <a href="book.php?doctor=<?php echo $doctor['id']; ?>" 
+                                    <a href="book.php?doctor=<?php echo $doctor['id']; ?>"
                                        class="flex-1 text-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
                                         <i class="fas fa-calendar-plus ml-1"></i>
                                         حجز موعد
                                     </a>
-                                    <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>" 
+                                    <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>"
                                        class="flex-1 text-center px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors">
                                         <i class="fas fa-user ml-1"></i>
                                         الملف الشخصي
@@ -430,17 +444,17 @@ try {
             tabContents.forEach(content => {
                 content.classList.remove('active');
             });
-            
+
             // Remove active class from all buttons
             const tabButtons = document.querySelectorAll('.tab-btn');
             tabButtons.forEach(button => {
                 button.classList.remove('bg-blue-600', 'text-white');
                 button.classList.add('text-gray-600', 'hover:bg-gray-100');
             });
-            
+
             // Show selected tab content
             document.getElementById(tabName).classList.add('active');
-            
+
             // Add active class to selected button
             const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
             activeButton.classList.remove('text-gray-600', 'hover:bg-gray-100');

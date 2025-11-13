@@ -54,7 +54,7 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <style>
+<style>
         body {
             font-family: 'Cairo', sans-serif;
         }
@@ -159,7 +159,7 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                                         <p class="font-semibold"><?php echo htmlspecialchars($hospital['phone']); ?></p>
                                     </div>
                                 </div>
-                            <?php endif; ?>
+                        <?php endif; ?>
 
                             <?php if (!empty($hospital['email'])): ?>
                                 <div class="flex items-center gap-3">
@@ -171,7 +171,7 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                                         <p class="font-semibold"><?php echo htmlspecialchars($hospital['email']); ?></p>
                                     </div>
                                 </div>
-                            <?php endif; ?>
+                        <?php endif; ?>
                         </div>
                     </div>
                     <div class="rounded-3xl bg-white/10 backdrop-blur-lg border border-white/20 p-6 md:p-8 shadow-xl flex flex-col justify-between">
@@ -179,21 +179,21 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                             <div>
                                 <p class="text-white/80 text-sm">تقييم المستشفى</p>
                                 <p class="text-4xl font-black mt-1"><?php echo number_format((float)($hospital['rating'] ?? 0), 1); ?></p>
-                            </div>
+                </div>
                             <div class="flex items-center gap-2 text-yellow-300 text-xl">
-                                <?php
+                        <?php
                                 $rating = (float)($hospital['rating'] ?? 0);
-                                for ($i = 1; $i <= 5; $i++) {
-                                    if ($i <= $rating) {
-                                        echo '<i class="fas fa-star"></i>';
-                                    } elseif ($i - $rating < 1) {
-                                        echo '<i class="fas fa-star-half-alt"></i>';
-                                    } else {
-                                        echo '<i class="far fa-star"></i>';
-                                    }
-                                }
-                                ?>
-                            </div>
+                        for ($i = 1; $i <= 5; $i++) {
+                            if ($i <= $rating) {
+                                echo '<i class="fas fa-star"></i>';
+                            } elseif ($i - $rating < 1) {
+                                echo '<i class="fas fa-star-half-alt"></i>';
+                            } else {
+                                echo '<i class="far fa-star"></i>';
+                            }
+                        }
+                        ?>
+                    </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-white/80">
                             <div class="px-4 py-3 rounded-2xl bg-white/10 border border-white/20">
@@ -232,9 +232,9 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                     <p class="text-lg text-gray-600 max-w-2xl mx-auto">
                         اختر العيادة المناسبة حسب التخصص، الرسوم، وسائل التواصل، وتعرّف على وصف التخصصات بالتفصيل.
                     </p>
-                </div>
+            </div>
 
-                <?php if (empty($clinics)): ?>
+            <?php if (empty($clinics)): ?>
                     <div class="bg-white rounded-3xl shadow-lg p-12 text-center border border-dashed border-gray-200">
                         <div class="w-20 h-20 mx-auto rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-6">
                             <i class="fas fa-stethoscope text-3xl"></i>
@@ -247,10 +247,10 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                             <i class="fas fa-arrow-left"></i>
                             العودة إلى قائمة المستشفيات
                         </a>
-                    </div>
-                <?php else: ?>
+                </div>
+            <?php else: ?>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <?php foreach ($clinics as $clinic): ?>
+                    <?php foreach ($clinics as $clinic): ?>
                             <div class="bg-white rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
                                 <div class="p-6 md:p-8">
                                     <div class="flex items-start justify-between gap-4 mb-6">
@@ -263,61 +263,61 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                                                     <i class="fas fa-heartbeat"></i>
                                                     <?php echo htmlspecialchars($clinic['specialty_name']); ?>
                                                 </span>
-                                            <?php endif; ?>
-                                        </div>
+                                    <?php endif; ?>
+                                </div>
                                         <div class="text-center">
                                             <div class="flex items-center justify-center gap-1 text-yellow-400 text-lg mb-1">
-                                                <?php
+                                        <?php
                                                 $clinic_rating = (float)($clinic['rating'] ?? 0);
-                                                for ($i = 1; $i <= 5; $i++) {
-                                                    if ($i <= $clinic_rating) {
-                                                        echo '<i class="fas fa-star"></i>';
-                                                    } elseif ($i - $clinic_rating < 1) {
-                                                        echo '<i class="fas fa-star-half-alt"></i>';
-                                                    } else {
-                                                        echo '<i class="far fa-star"></i>';
-                                                    }
-                                                }
-                                                ?>
-                                            </div>
-                                            <span class="text-sm font-semibold text-gray-700"><?php echo number_format($clinic_rating, 1); ?></span>
-                                        </div>
+                                        for ($i = 1; $i <= 5; $i++) {
+                                            if ($i <= $clinic_rating) {
+                                                echo '<i class="fas fa-star"></i>';
+                                            } elseif ($i - $clinic_rating < 1) {
+                                                echo '<i class="fas fa-star-half-alt"></i>';
+                                            } else {
+                                                echo '<i class="far fa-star"></i>';
+                                            }
+                                        }
+                                        ?>
                                     </div>
+                                            <span class="text-sm font-semibold text-gray-700"><?php echo number_format($clinic_rating, 1); ?></span>
+                                </div>
+                            </div>
 
                                     <?php if (!empty($clinic['description'])): ?>
                                         <p class="text-gray-600 leading-relaxed mb-6">
                                             <?php echo htmlspecialchars($clinic['description']); ?>
                                         </p>
-                                    <?php endif; ?>
+                                <?php endif; ?>
 
                                     <div class="space-y-3 mb-6">
                                         <?php if (!empty($clinic['phone'])): ?>
                                             <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100">
                                                 <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-100 text-blue-600">
-                                                    <i class="fas fa-phone"></i>
+                                            <i class="fas fa-phone"></i>
                                                 </span>
                                                 <span class="text-gray-700 font-semibold"><?php echo htmlspecialchars($clinic['phone']); ?></span>
-                                            </div>
-                                        <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
 
                                         <?php if (!empty($clinic['email'])): ?>
                                             <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100">
                                                 <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-100 text-blue-600">
-                                                    <i class="fas fa-envelope"></i>
+                                            <i class="fas fa-envelope"></i>
                                                 </span>
                                                 <span class="text-gray-700 font-semibold"><?php echo htmlspecialchars($clinic['email']); ?></span>
-                                            </div>
-                                        <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
 
                                         <?php if (!empty($clinic['consultation_fee'])): ?>
                                             <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100">
                                                 <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-green-100 text-green-600">
-                                                    <i class="fas fa-money-bill-wave"></i>
+                                            <i class="fas fa-money-bill-wave"></i>
                                                 </span>
                                                 <span class="text-gray-700 font-semibold">رسوم الاستشارة: <?php echo number_format((float)$clinic['consultation_fee']); ?> جنيه</span>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
 
                                     <?php if (!empty($clinic['specialty_description'])): ?>
                                         <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-6">
@@ -328,27 +328,27 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                                             <p class="text-blue-600 leading-relaxed">
                                                 <?php echo htmlspecialchars($clinic['specialty_description']); ?>
                                             </p>
-                                        </div>
-                                    <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
 
                                     <div class="flex flex-col md:flex-row gap-4">
                                         <a href="doctors.php?clinic=<?php echo $clinic['id']; ?>"
                                            class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
-                                            <i class="fas fa-user-md"></i>
-                                            عرض الأطباء
-                                        </a>
+                                    <i class="fas fa-user-md"></i>
+                                    عرض الأطباء
+                                </a>
                                         <a href="book.php?clinic=<?php echo $clinic['id']; ?>"
                                            class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-100 hover:bg-blue-50 transition">
-                                            <i class="fas fa-calendar-plus"></i>
-                                            حجز موعد
-                                        </a>
+                                    <i class="fas fa-calendar-plus"></i>
+                                    حجز موعد
+                                </a>
                                     </div>
-                                </div>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
         </section>
     </main>
 
@@ -405,9 +405,10 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
             <div class="border-t border-white/10 mt-10 pt-6 text-center text-gray-500 text-sm">
                 <?php echo date('Y'); ?> Health Tech. جميع الحقوق محفوظة.
             </div>
-        </div>
+    </div>
     </footer>
 </body>
 
 </html>
 
+    

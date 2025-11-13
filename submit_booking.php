@@ -38,15 +38,15 @@ try {
     $stmt = $conn->prepare("SELECT id FROM doctors WHERE user_id = ?");
     $stmt->execute([$doctor_user_id]);
     $doctor_record = $stmt->fetch();
-    
+
     if (!$doctor_record) {
         $_SESSION['error_message'] = 'الطبيب المحدد غير موجود.';
         header('Location: book_appointment.php?doctor_id=' . $doctor_user_id);
         exit();
     }
-    
+
     $doctor_id = $doctor_record['id'];
-    
+
 } catch (PDOException $e) {
     error_log('Doctor lookup error: ' . $e->getMessage());
     $_SESSION['error_message'] = 'حدث خطأ في العثور على بيانات الطبيب.';

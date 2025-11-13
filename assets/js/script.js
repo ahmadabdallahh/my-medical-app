@@ -198,10 +198,17 @@ function validateField(field) {
     }
   }
 
-  // Password strength validation
+  // Password validation - فقط 6 أحرف على الأقل
   if (field.type === 'password' && value) {
-    const strength = calculatePasswordStrength(value);
-    updatePasswordStrengthIndicator(field, strength);
+    if (value.length < 6) {
+      field.classList.add('error');
+      isValid = false;
+    } else {
+      // لا نعرض مؤشر القوة، فقط نتحقق من الحد الأدنى
+      const strength = calculatePasswordStrength(value);
+      // يمكن إزالة updatePasswordStrengthIndicator إذا لم تكن ضرورية
+      // updatePasswordStrengthIndicator(field, strength);
+    }
   }
 
   // Add success state for valid fields
@@ -213,15 +220,13 @@ function validateField(field) {
 }
 
 function calculatePasswordStrength(password) {
-  let strength = 0;
+  // متطلبات بسيطة: فقط 6 أحرف على الأقل
+  if (password.length < 6) {
+    return 0; // ضعيف جداً
+  }
 
-  if (password.length >= 8) strength++;
-  if (/[a-z]/.test(password)) strength++;
-  if (/[A-Z]/.test(password)) strength++;
-  if (/[0-9]/.test(password)) strength++;
-  if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-  return strength;
+  // إذا كانت 6 أحرف أو أكثر، تعتبر مقبولة
+  return 3; // متوسط (مقبول)
 }
 
 function updatePasswordStrengthIndicator(field, strength) {

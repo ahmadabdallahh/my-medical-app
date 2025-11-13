@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($email_check->fetch()) {
                     $errors['email'] = 'البريد الإلكتروني موجود مسبقاً';
                 }
-                
+
                 $username_check = $conn->prepare("SELECT id FROM users WHERE username = ?");
                 $username_check->execute([$form_data['username']]);
                 if ($username_check->fetch()) {
@@ -183,6 +183,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .radio-option input[type="radio"] {
             margin: 0;
         }
+        .password-wrapper { position: relative; }
+        .toggle-visibility {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 12px; /* RTL: icon on the left side */
+            background: transparent;
+            border: 0;
+            color: #777;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .toggle-visibility:focus { outline: none; }
     </style>
 </head>
 
@@ -238,13 +251,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="form-row">
                             <div class="form-group <?php echo isset($errors['password']) ? 'error' : ''; ?>">
                                 <label for="password">كلمة المرور</label>
-                                <input type="password" id="password" name="password" required>
+                                <div class="password-wrapper">
+                                    <input type="password" id="password" name="password" minlength="6" required>
+                                    <button type="button" class="toggle-visibility" aria-label="إظهار/إخفاء كلمة المرور" data-target="password">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
                                 <?php if (isset($errors['password'])): ?><span class="error-message"><?php echo $errors['password']; ?></span><?php endif; ?>
                             </div>
 
                             <div class="form-group <?php echo isset($errors['confirm_password']) ? 'error' : ''; ?>">
                                 <label for="confirm_password">تأكيد كلمة المرور</label>
-                                <input type="password" id="confirm_password" name="confirm_password" required>
+                                <div class="password-wrapper">
+                                    <input type="password" id="confirm_password" name="confirm_password" required>
+                                    <button type="button" class="toggle-visibility" aria-label="إظهار/إخفاء تأكيد كلمة المرور" data-target="confirm_password">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
                                 <?php if (isset($errors['confirm_password'])): ?><span class="error-message"><?php echo $errors['confirm_password']; ?></span><?php endif; ?>
                             </div>
                         </div>
@@ -261,8 +284,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <option value="" disabled <?php echo empty($form_data['user_type']) ? 'selected' : ''; ?>>-- اختر --</option>
                                 <option value="patient" <?php echo ($form_data['user_type'] == 'patient') ? 'selected' : ''; ?>>مريض</option>
                                 <option value="doctor" <?php echo ($form_data['user_type'] == 'doctor') ? 'selected' : ''; ?>>طبيب</option>
-                                <option value="hospital" <?php echo ($form_data['user_type'] == 'hospital') ? 'selected' : ''; ?>>مستشفى</option>
-                                <option value="admin" <?php echo ($form_data['user_type'] == 'admin') ? 'selected' : ''; ?>>مسؤول</option>
                             </select>
                             <?php if (isset($errors['user_type'])): ?><span class="error-message"><?php echo $errors['user_type']; ?></span><?php endif; ?>
                         </div>
@@ -303,6 +324,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
     </div>
+<script>
+    (function(){
+        function toggleVisibility(btn){
+            var targetId = btn.getAttribute('data-target');
+            var input = document.getElementById(targetId);
+            if(!input) return;
+            var isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            var icon = btn.querySelector('i');
+            if(icon){
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
+        }
+        document.addEventListener('click', function(e){
+            var btn = e.target.closest('.toggle-visibility');
+            if(btn){
+                toggleVisibility(btn);
+            }
+        });
+    })();
+</script>
 </body>
 
 </html>

@@ -1,3 +1,10 @@
+<?php
+// Determine base path for navigation links
+$script_path = $_SERVER['SCRIPT_NAME'] ?? '';
+// Determine if we're in a subdirectory and need relative path adjustment
+$is_subdir = preg_match('#/(doctor|admin|hospital|patient)/#', $script_path);
+$base_path = $is_subdir ? '../' : '';
+?>
 <footer class="bg-gray-800 text-white pt-12 pb-8">
     <div class="container mx-auto px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-right">
@@ -17,8 +24,8 @@
             <div>
                 <h4 class="font-bold text-lg mb-4">روابط سريعة</h4>
                 <ul class="space-y-2">
-                    <li><a href="index.php" class="text-gray-400 hover:text-white">الرئيسية</a></li>
-                    <li><a href="search.php" class="text-gray-400 hover:text-white">البحث عن طبيب</a></li>
+                    <li><a href="<?php echo $base_path; ?>index.php" class="text-gray-400 hover:text-white">الرئيسية</a></li>
+                    <li><a href="<?php echo $base_path; ?>search.php" class="text-gray-400 hover:text-white">البحث عن طبيب</a></li>
                     <li><a href="#" class="text-gray-400 hover:text-white">من نحن</a></li>
                     <li><a href="#" class="text-gray-400 hover:text-white">خدماتنا</a></li>
                 </ul>
@@ -28,7 +35,7 @@
             <div>
                 <h4 class="font-bold text-lg mb-4">حجز المواعيد</h4>
                 <ul class="space-y-2">
-                    <li><a href="appointments.php" class="text-gray-400 hover:text-white">مواعيدي</a></li>
+                    <li><a href="<?php echo $base_path; ?>appointments.php" class="text-gray-400 hover:text-white">مواعيدي</a></li>
                     <li><a href="#" class="text-gray-400 hover:text-white">إدارة المستشفيات</a></li>
                 </ul>
             </div>
