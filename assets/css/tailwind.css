@@ -1,0 +1,342 @@
+/* Tailwind CSS with Enhanced Medical Colors */
+@import 'https://cdn.tailwindcss.com';
+
+/* Enhanced Medical Color Palette - متوافق مع style.css */
+:root {
+    /* نظام ألوان طبي محسّن ومتطور */
+    --primary-color: #0EA5E9;
+    /* أزرق طبي حديث وواضح */
+    --primary-dark: #0284C7;
+    /* أزرق داكن للتفاعل */
+    --primary-light: #7DD3FC;
+    /* أزرق فاتح للخلفيات */
+
+    --secondary-color: #10B981;
+    /* أخضر صحي ومريح للعين */
+    --secondary-dark: #059669;
+    /* أخضر داكن */
+    --secondary-light: #6EE7B7;
+    /* أخضر فاتح */
+
+    --accent-color: #F59E0B;
+    /* برتقالي دافئ ومتوازن */
+    --accent-dark: #D97706;
+    /* برتقالي داكن */
+    --accent-light: #FCD34D;
+    /* برتقالي فاتح */
+
+    --info-color: #06B6D4;
+    /* أزرق معلوماتي */
+    --success: #10B981;
+    /* أخضر نجاح واضح */
+    --warning: #F59E0B;
+    /* برتقالي تحذير */
+    --error: #DC2626;
+    /* أحمر خطأ واضح */
+    --danger: #EF4444;
+    /* أحمر خطر */
+
+    /* ألوان الخلفيات المحسّنة */
+    --bg-primary: #FFFFFF;
+    /* أبيض نقي */
+    --bg-secondary: #F8FAFC;
+    /* رمادي فاتح جداً */
+    --bg-tertiary: #F1F5F9;
+    /* رمادي فاتح */
+    --bg-dark: #1E293B;
+    /* رمادي داكن للعناصر المتقدمة */
+
+    /* ألوان النصوص المحسّنة */
+    --text-primary: #1E293B;
+    /* رمادي داكن للنص الأساسي */
+    --text-secondary: #475569;
+    /* رمادي متوسط للنص الثانوي */
+    --text-muted: #64748B;
+    /* رمادي فاتح للنص المكتوم */
+    --text-light: #94A3B8;
+    /* رمادي فاتح جداً */
+    --text-white: #FFFFFF;
+    /* أبيض للنص على الخلفيات الداكنة */
+
+    /* ألوان الحدود المحسّنة */
+    --border-color: #E2E8F0;
+    /* حدود ناعمة */
+    --border-light: #F1F5F9;
+    /* حدود فاتحة */
+    --border-dark: #CBD5E1;
+    /* حدود داكنة */
+}
+
+/* Tailwind Config */
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                'hospital': {
+                    'primary': '#0EA5E9',
+                    'primary-dark': '#0284C7',
+                    'primary-light': '#7DD3FC',
+                    'secondary': '#10B981',
+                    'secondary-dark': '#059669',
+                    'secondary-light': '#6EE7B7',
+                    'accent': '#F59E0B',
+                    'accent-dark': '#D97706',
+                    'accent-light': '#FCD34D',
+                    'info': '#06B6D4',
+                    'success': '#10B981',
+                    'warning': '#F59E0B',
+                    'error': '#DC2626',
+                    'danger': '#EF4444',
+                }
+            },
+            fontFamily: {
+                'cairo': ['Cairo', 'sans-serif'],
+            },
+            boxShadow: {
+                'medical': '0 8px 32px rgba(14, 165, 233, 0.15)',
+                'medical-hover': '0 25px 50px -12px rgba(14, 165, 233, 0.25)',
+            },
+            borderRadius: {
+                'medical': '12px',
+            },
+            animation: {
+                'pulse-medical': 'pulse-medical 2s infinite',
+                'fade-in': 'fadeIn 0.5s ease-in-out',
+                'slide-up': 'slideUp 0.3s ease-out',
+            },
+            keyframes: {
+                'pulse-medical': {
+                    '0%, 100%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.05)' }
+                },
+                'fadeIn': {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' }
+                },
+                'slideUp': {
+                    '0%': { transform: 'translateY(20px)', opacity: '0' },
+                    '100%': { transform: 'translateY(0)', opacity: '1' }
+                }
+            }
+        }
+    }
+}
+
+/* Custom Hospital Components */
+.hospital-nav {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.hospital-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.hospital-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hospital-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medical);
+    border-color: var(--primary-light);
+}
+
+.hospital-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-white);
+    font-size: 2rem;
+    box-shadow: var(--shadow-medical);
+}
+
+.hospital-btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: var(--text-white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.hospital-btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medical-hover);
+}
+
+.hospital-btn-secondary {
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+    color: var(--text-white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.hospital-btn-secondary:hover {
+    background: linear-gradient(135deg, var(--secondary-dark), var(--secondary-color));
+    transform: translateY(-2px);
+}
+
+.hospital-btn-accent {
+    background: transparent;
+    color: var(--primary-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.hospital-btn-accent::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+.hospital-btn-accent:hover::after {
+    width: 100%;
+}
+
+.hospital-btn-accent:hover {
+    color: var(--text-white);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.hospital-btn-success {
+    background: linear-gradient(135deg, var(--success), var(--secondary-dark));
+    color: var(--text-white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.hospital-btn-success:hover {
+    background: linear-gradient(135deg, var(--secondary-dark), var(--success));
+    transform: translateY(-2px);
+}
+
+/* Medical Form Styles */
+.medical-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.medical-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.medical-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.medical-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    background: var(--bg-secondary);
+}
+
+/* Medical Alert Styles */
+.medical-alert-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.medical-alert-error {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05));
+    color: var(--error);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.medical-alert-warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.medical-alert-info {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.05));
+    color: var(--primary-color);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}

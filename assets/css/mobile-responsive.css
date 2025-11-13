@@ -1,0 +1,446 @@
+/**
+ * إصلاحات الجوال والاستجابة الشاملة
+ * Comprehensive Mobile Responsive Fixes
+ *
+ * يغطي:
+ * - Touch targets optimization
+ * - Viewport fixes
+ * - Responsive images
+ * - Mobile navigation
+ * - Offline functionality indicators
+ * - Camera integration fixes
+ */
+
+/* 1. Viewport and Base Mobile Fixes */
+@viewport {
+    width: device-width;
+    zoom: 1.0;
+    user-zoom: fixed;
+}
+
+/* Touch targets optimization - 44px minimum */
+.touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+    margin: 8px;
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* Mobile button improvements */
+.mobile-button {
+    min-height: 48px;
+    padding: 14px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Enhanced touch feedback */
+.mobile-button:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+}
+
+/* 2. Responsive Typography */
+@media screen and (max-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+    h4 { font-size: 1.25rem; }
+
+    /* Prevent zoom on iOS */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="search"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+}
+
+/* 3. Mobile Navigation Fixes */
+.mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+    z-index: 1000;
+    padding: 8px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 8px 4px;
+    text-decoration: none;
+    color: #64748b;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-item.active {
+    color: #2563eb;
+}
+
+.mobile-nav-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+/* 4. Responsive Form Elements */
+.form-container {
+    max-width: 100%;
+    padding: 16px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* 5. Responsive Cards */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin: 16px;
+    overflow: hidden;
+}
+
+.card-content {
+    padding: 16px;
+}
+
+@media screen and (max-width: 768px) {
+    .card {
+        margin: 8px;
+        border-radius: 8px;
+    }
+
+    .card-content {
+        padding: 12px;
+    }
+}
+
+/* 6. Responsive Images */
+.responsive-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.responsive-image[srcset] {
+    width: 100%;
+    height: auto;
+}
+
+/* 7. Mobile Calendar Fixes */
+.mobile-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 8px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 14px;
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+/* 8. Offline Functionality Indicators */
+.offline-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #ef4444;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    z-index: 9999;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+}
+
+.offline-indicator.show {
+    transform: translateY(0);
+}
+
+/* 9. Camera Integration Fixes */
+.camera-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f3f4f6;
+}
+
+.camera-preview {
+    width: 100%;
+    max-width: 300px;
+    height: 300px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.camera-button {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #2563eb;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* 10. Loading States */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 11. Responsive Tables */
+.responsive-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table table {
+    min-width: 600px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+@media screen and (max-width: 768px) {
+    .responsive-table {
+        font-size: 14px;
+    }
+
+    .responsive-table th,
+    .responsive-table td {
+        padding: 8px 12px;
+        white-space: nowrap;
+    }
+}
+
+/* 12. Modal Fixes for Mobile */
+.mobile-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.mobile-modal-content {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 100%;
+    margin: 16px;
+}
+
+/* 13. Notification System */
+.mobile-notification {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 16px;
+    z-index: 1001;
+    transform: translateY(-100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.mobile-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* 14. Responsive Grid System */
+.responsive-grid {
+    display: grid;
+    gap: 16px;
+    padding: 16px;
+}
+
+@media screen and (max-width: 768px) {
+    .responsive-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px;
+    }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .responsive-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (min-width: 1025px) {
+    .responsive-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 15. Safe Area Support for Modern Devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .mobile-safe-area {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
+/* 16. Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .mobile-nav {
+        background: #1f2937;
+        border-top-color: #374151;
+    }
+
+    .mobile-nav-item {
+        color: #9ca3af;
+    }
+
+    .mobile-nav-item.active {
+        color: #60a5fa;
+    }
+
+    .card {
+        background: #374151;
+        border-color: #4b5563;
+    }
+
+    .form-input {
+        background: #1f2937;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+}
+
+/* 17. High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .mobile-button {
+        border: 2px solid currentColor;
+    }
+
+    .form-input {
+        border-width: 2px;
+    }
+}
+
+/* 18. Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 19. Print Styles */
+@media print {
+    .mobile-nav,
+    .offline-indicator {
+        display: none;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
+
+/* 20. Accessibility Improvements */
+@media (prefers-reduced-transparency: reduce) {
+    .mobile-modal {
+        background: #000;
+    }
+}
+
+/* Focus indicators */
+*:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* High visibility focus for keyboard navigation */
+@media (prefers-reduced-motion: no-preference) {
+    *:focus-visible {
+        outline: 2px solid #2563eb;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    }
+}

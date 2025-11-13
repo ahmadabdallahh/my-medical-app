@@ -1,0 +1,464 @@
+/* ========================================
+   CARD STYLES
+   ======================================== */
+
+/* Enhanced Card Styles */
+.card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--radius-xl);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card-header {
+    padding: var(--spacing-6);
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.card-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-2);
+}
+
+.card-subtitle {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.card-body {
+    padding: var(--spacing-6);
+}
+
+.card-footer {
+    padding: var(--spacing-6);
+    background: var(--neutral-50);
+    border-top: 1px solid var(--neutral-200);
+}
+
+/* Feature Cards */
+.feature-card {
+    background: var(--bg-primary);
+    padding: var(--spacing-8);
+    border-radius: var(--radius-2xl);
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--radius-2xl);
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-hover);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--spacing-6);
+    position: relative;
+    transition: var(--transition);
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+.feature-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.feature-card h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-4);
+    color: var(--text-primary);
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Hospital Cards */
+.hospital-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+}
+
+.hospital-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-hover);
+}
+
+.hospital-image {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.hospital-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.hospital-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.hospital-card:hover .hospital-image img {
+    transform: scale(1.1);
+}
+
+.hospital-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hospital-card:hover .hospital-image::after {
+    opacity: 1;
+}
+
+.hospital-info {
+    padding: var(--spacing-6);
+}
+
+.hospital-name {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-3);
+    color: var(--text-primary);
+}
+
+.hospital-address {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hospital-address i {
+    color: var(--primary-color);
+}
+
+.hospital-rating {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.star {
+    color: var(--creative-yellow);
+    font-size: 1rem;
+}
+
+.rating-text {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Doctor Cards */
+.doctor-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+}
+
+.doctor-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-hover);
+}
+
+.doctor-header {
+    padding: var(--spacing-6);
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+}
+
+.doctor-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto var(--spacing-4);
+    overflow: hidden;
+    border: 4px solid white;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.doctor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.doctor-info {
+    text-align: center;
+}
+
+.doctor-name {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-2);
+    color: var(--text-primary);
+}
+
+.experience-tag {
+    display: inline-block;
+    background: var(--gradient-primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin-bottom: var(--spacing-3);
+}
+
+.doctor-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+}
+
+.doctor-content {
+    padding: var(--spacing-6);
+}
+
+.education-info {
+    margin-bottom: var(--spacing-6);
+}
+
+.education-info h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-2);
+    color: var(--text-primary);
+}
+
+.education-info p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.doctor-details {
+    display: grid;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.info-item h4 {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 80px;
+}
+
+.info-item p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.contact-info {
+    background: var(--bg-secondary);
+    padding: var(--spacing-4);
+    border-radius: var(--radius);
+    margin-bottom: var(--spacing-6);
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-2);
+    padding: var(--spacing-2);
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+
+.contact-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.contact-item i {
+    color: var(--primary-color);
+    width: 20px;
+    text-align: center;
+}
+
+.contact-item .label {
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 80px;
+}
+
+.contact-item .value {
+    color: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        margin: var(--spacing-2);
+    }
+
+    .feature-card {
+        padding: var(--spacing-6);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .feature-icon i {
+        font-size: 1.5rem;
+    }
+
+    .hospital-header {
+        padding: var(--spacing-4);
+    }
+
+    .clinics-grid,
+    .doctors-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-4);
+    }
+
+    .clinic-actions,
+    .doctor-actions {
+        flex-direction: column;
+        gap: var(--spacing-2);
+    }
+
+    .doctor-header {
+        padding: var(--spacing-4);
+    }
+
+    .doctor-profile .doctor-header {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-4);
+    }
+
+    .doctor-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .feature-card,
+    .hospital-card {
+        margin: var(--spacing-2);
+    }
+
+    .hospital-info-section {
+        padding: var(--spacing-4);
+    }
+
+    .clinic-card,
+    .doctor-card {
+        margin: var(--spacing-2);
+    }
+
+    .doctor-profile {
+        padding: var(--spacing-4);
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-4);
+    }
+
+    .stat-number {
+        font-size: var(--font-size-2xl);
+    }
+}

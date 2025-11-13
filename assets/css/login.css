@@ -1,0 +1,240 @@
+/* General Body Styles */
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: #eef5ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    direction: rtl;
+}
+
+/* Main Container for the Login Box */
+.login-container {
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+}
+
+.login-box {
+    display: flex;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Image Section (Right Side) */
+.image-section {
+    flex-basis: 50%;
+    background: linear-gradient(160deg, #8699da, #d3a3e4);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+
+.image-section .image-content img {
+    max-width: 80%;
+    margin-bottom: 20px;
+}
+
+.image-section .welcome-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.image-section .welcome-text p {
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+/* Form Section (Left Side) */
+.form-section {
+    flex-basis: 50%;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-content {
+    width: 100%;
+    max-width: 350px;
+}
+
+.form-content .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #5b6987;
+}
+
+.form-content .logo i {
+    color: #6c84ee;
+    margin-left: 10px;
+}
+
+.form-content h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: 'Cairo', sans-serif;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #6c84ee;
+    box-shadow: 0 0 0 3px rgba(108, 132, 238, 0.2);
+}
+
+/* Password Wrapper */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .toggle-password {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #aaa;
+}
+
+/* Error State */
+.form-group.error input {
+    border-color: #e74c3c;
+}
+
+.form-group.error input:focus {
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    display: block;
+    margin-top: 5px;
+}
+
+/* Fix for Terms and Conditions Checkbox */
+.form-group.terms {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem; /* Space between checkbox and label */
+}
+
+.form-group.terms input[type="checkbox"] {
+    width: auto; /* Reset width */
+    height: auto;
+    margin: 0;
+    padding: 0;
+    accent-color: var(--primary-color, #2563eb);
+    transform: scale(1.1);
+}
+
+.form-group.terms label {
+    margin-bottom: 0; /* Override default margin */
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.form-group.terms label a {
+    color: var(--primary-color, #2563eb);
+    text-decoration: none;
+}
+
+.form-group.terms label a:hover {
+    text-decoration: underline;
+}
+
+/* Login Button */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: #6c84ee;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-login:hover {
+    background-color: #576dcc;
+}
+
+/* Links below the form */
+.links {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.links a {
+    color: #6c84ee;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+.links p {
+    margin-top: 10px;
+    color: #777;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-box {
+        flex-direction: column;
+    }
+
+    .image-section {
+        display: none; /* Hide image on smaller screens for a simpler UI */
+    }
+
+    .form-section {
+        padding: 30px;
+    }
+}

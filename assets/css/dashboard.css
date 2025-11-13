@@ -1,0 +1,214 @@
+/*
+ * Dashboard Stylesheet
+ * For Admin, Doctor, Patient, and Hospital Dashboards
+ */
+
+:root {
+    --dashboard-bg: #f8f9fa;
+    /* خلفية لوحة التحكم */
+    --sidebar-bg: #ffffff;
+    /* خلفية الشريط الجانبي */
+    --sidebar-width: 260px;
+    /* عرض الشريط الجانبي */
+    --sidebar-link-color: #5c677d;
+    --sidebar-link-hover-bg: #f1f5f9;
+    --sidebar-link-active-bg: var(--primary-color);
+    --sidebar-link-active-color: #ffffff;
+    --widget-bg: #ffffff;
+    --border-color: #e9ecef;
+}
+
+body {
+    background-color: var(--dashboard-bg);
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.dashboard-sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    border-left: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.sidebar-header .logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.sidebar-header .logo i {
+    margin-left: 8px;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    color: var(--sidebar-link-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border-right: 3px solid transparent;
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--sidebar-link-hover-bg);
+    color: var(--primary-color);
+}
+
+.sidebar-nav a.active {
+    background-color: var(--sidebar-link-active-bg);
+    color: var(--sidebar-link-active-color);
+    border-right-color: var(--secondary-color);
+}
+
+.sidebar-nav a i {
+    margin-left: 15px;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Main Content Styles */
+.dashboard-content {
+    flex-grow: 1;
+    padding: 30px;
+    margin-right: var(--sidebar-width);
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.dashboard-header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Widgets Styles */
+.dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.widget {
+    background-color: var(--widget-bg);
+    padding: 25px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.widget:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.widget-icon {
+    font-size: 32px;
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.widget-info h4 {
+    margin: 0 0 5px 0;
+    color: var(--text-light);
+    font-size: 16px;
+}
+
+.widget-info p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.dashboard-main-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .dashboard-sidebar {
+        right: -100%;
+        /* Hide sidebar by default */
+        z-index: 1000;
+    }
+
+    .dashboard-sidebar.open {
+        right: 0;
+    }
+
+    .dashboard-content {
+        margin-right: 0;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-content {
+        padding: 15px;
+    }
+
+    .dashboard-widgets {
+        grid-template-columns: 1fr;
+    }
+}

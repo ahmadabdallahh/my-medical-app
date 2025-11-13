@@ -1,0 +1,193 @@
+/* ==========================================
+   Search Page Styles
+   ========================================== */
+
+.search-page-container {
+    padding: 2rem;
+}
+
+.search-page-container .page-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.search-page-container .page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.search-page-container .page-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-form-card {
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+}
+
+.search-form .search-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.search-form .form-group-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-summary {
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--primary-color);
+}
+
+.search-summary h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.tabs-container {
+    margin-bottom: 2rem;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.doctor-card, .hospital-card {
+    transition: var(--transition);
+}
+
+.doctor-card:hover, .hospital-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.doctor-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.doctor-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+
+.doctor-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.doctor-specialty {
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.doctor-location {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stars i {
+    color: #ffc107;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem;
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.no-results i {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.no-results h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.no-results p {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .search-form .search-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .search-form .form-group-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+}
