@@ -159,7 +159,7 @@ require_once 'includes/functions.php';
                             <i class="fas fa-map-marker-alt"></i>
                             <div>
                                 <h4>العنوان</h4>
-                                <p>القاهرة، مصر</p>
+                                <p>دمنهور، البحيرة</p>
                             </div>
                         </div>
                         <div class="contact-item">

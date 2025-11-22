@@ -126,7 +126,8 @@ $pageTitle = 'حجز موعد مع ' . htmlspecialchars($doctor['full_name']);
                             <div id="time-slots-placeholder" class="absolute inset-0 flex items-center justify-center text-center">
                                 <div>
                                     <i class="fas fa-calendar-day fa-3x text-gray-300 mb-3"></i>
-                                    <p class="text-gray-500 font-semibold">الرجاء اختيار يوم من التقويم لعرض الأوقات المتاحة.</p>
+                                    <p class="text-gray-500 font-semibold">اختر اليوم المناسب لعرض المواعيد المتاحة</p>
+                                    <p class="text-gray-400 text-sm mt-1">ستظهر أوقات العمل المتاحة للدكتور</p>
                                 </div>
                             </div>
                             <!-- Time Slots Grid -->
@@ -184,8 +185,9 @@ $(function () {
         toggleTimeSlotsDisplay(false); // Show placeholder
         timeSlotsPlaceholder.html(`
             <div>
-                <i class="fas fa-spinner fa-spin fa-2x text-gray-400"></i>
-                <p class="mt-2 text-gray-500 font-semibold">جاري تحميل المواعيد...</p>
+                <i class="fas fa-spinner fa-spin fa-2x text-blue-400"></i>
+                <p class="mt-2 text-gray-500 font-semibold">جاري البحث عن المواعيد المتاحة...</p>
+                <p class="text-gray-400 text-sm mt-1">يرجى الانتظار لحظة</p>
             </div>
         `);
 
@@ -215,8 +217,9 @@ $(function () {
                 } else {
                     timeSlotsPlaceholder.html(`
                         <div>
-                            <i class="fas fa-calendar-times fa-3x text-gray-300 mb-3"></i>
-                            <p class="text-gray-500 font-semibold">لا توجد مواعيد متاحة في هذا اليوم. الرجاء اختيار يوم آخر.</p>
+                            <i class="fas fa-calendar-times fa-3x text-orange-300 mb-3"></i>
+                            <p class="text-gray-600 font-semibold mb-2">الدكتور غير متاح في هذا اليوم</p>
+                            <p class="text-gray-500 text-sm">جميع المواعيد محجوزة أو الدكتور لا يعمل اليوم. لا تقلق، يمكنك اختيار يوم آخر! 😊</p>
                         </div>
                     `);
                 }

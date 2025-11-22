@@ -116,28 +116,135 @@ $specialties = get_all_specialties($conn);
     <!-- Main Content -->
     <main>
         <!-- Hero Section -->
-        <section
-            class="relative h-screen flex items-center justify-center text-center bg-gradient-to-br from-teal-400 to-blue-600 text-white p-4">
-            <div class="z-10 flex flex-col items-center">
-                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4">
-                    أهلاً بك! احجز موعدك الطبي بكل سهولة
+        <!-- Hero Section -->
+        <section class="relative h-screen min-h-[600px] flex items-center justify-center text-center overflow-hidden">
+            <!-- Background Image with Overlay -->
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                    alt="Medical Background" class="w-full h-full object-cover object-center" />
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-teal-800/80 mix-blend-multiply"></div>
+            </div>
+
+            <!-- Animated Shapes -->
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+                <div class="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+                <div class="absolute bottom-20 right-20 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl animate-pulse"
+                    style="animation-duration: 4s;"></div>
+            </div>
+
+            <div class="relative z-10 container mx-auto px-4 flex flex-col items-center">
+                <!-- Badge -->
+                <div
+                    class="mb-6 inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-1.5 text-white text-sm font-medium animate-fade-in-up">
+                    <span class="w-2 h-2 bg-green-400 rounded-full ml-2 animate-pulse"></span>
+                    منصتك الطبية الأولى في الشرق الأوسط
+                </div>
+
+                <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 text-white drop-shadow-lg tracking-tight">
+                    رعايتك الصحية.. <br class="md:hidden" />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-teal-200">بين
+                        يديك</span>
                 </h1>
-                <p class="text-lg md:text-xl text-white/80 mb-8 max-w-3xl">
-                    نظام Health Tech هو بوابتك الأولى للوصول إلى أفضل الأطباء والمستشفيات. ابحث، قارن، واحجز موعدك في
-                    دقائق معدودة.
+
+                <p class="text-lg md:text-2xl text-blue-50 mb-10 max-w-3xl leading-relaxed font-light">
+                    احجز موعدك مع أفضل الأطباء في مدينتك، بكل سهولة وأمان.
+                    <span class="hidden md:inline">نحن نجمع لك الخبرة الطبية والتكنولوجيا الحديثة لخدمة صحتك.</span>
                 </p>
 
-                <!-- Search Bar -->
-                <div class="w-full max-w-2xl">
-                    <form action="search.php" method="GET" class="relative" dir="rtl">
-                        <input type="text" name="query" placeholder="ابحث عن طبيب، تخصص، أو مستشفى..."
-                            class="w-full h-16 pr-16 pl-4 text-lg text-gray-800 bg-white rounded-full shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 transition-shadow duration-300 text-right placeholder-gray-400" />
-                        <button type="submit"
-                            class="absolute top-0 right-0 h-16 w-16 flex items-center justify-center text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md"
-                            aria-label="بدء البحث">
-                            <i class="fas fa-search text-xl"></i>
-                        </button>
+                <!-- Search Bar Container -->
+                <div class="w-full max-w-3xl transform hover:scale-[1.01] transition-transform duration-300">
+                    <form action="search.php" method="GET" class="relative group" dir="rtl">
+                        <div
+                            class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200">
+                        </div>
+                        <div class="relative flex items-center bg-white rounded-full shadow-2xl p-2">
+                            <div class="flex-grow relative">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                    <i class="fas fa-search text-gray-400 text-xl"></i>
+                                </div>
+                                <input type="text" name="query" placeholder="ابحث عن دكتور، تخصص، أو مستشفى..."
+                                    class="w-full h-14 pr-12 pl-4 text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-400" />
+                            </div>
+                            <button type="submit"
+                                class="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-blue-500/30 flex items-center gap-2">
+                                <span>بحث</span>
+                                <i
+                                    class="fas fa-arrow-left text-sm transform group-hover:-translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
                     </form>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="mt-12 grid grid-cols-3 gap-8 md:gap-16 text-white/90 border-t border-white/10 pt-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-1">+250</div>
+                        <div class="text-sm text-blue-200">طبيب متخصص</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-1">+500</div>
+                        <div class="text-sm text-blue-200">حجز ناجح</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-1">24/7</div>
+                        <div class="text-sm text-blue-200">خدمة متواصلة</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2">
+                        <div class="relative">
+                            <div class="absolute -top-4 -right-4 w-24 h-24 bg-blue-100 rounded-full -z-10"></div>
+                            <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-teal-100 rounded-full -z-10"></div>
+                            <div
+                                class="bg-gradient-to-br from-blue-600 to-teal-500 rounded-2xl p-1 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+                                <div
+                                    class="bg-white rounded-xl p-8 text-center h-full flex flex-col justify-center items-center min-h-[300px]">
+                                    <i
+                                        class="fas fa-heartbeat text-6xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500 mb-6"></i>
+                                    <h3 class="text-2xl font-bold text-gray-800">رعايتك أولويتنا</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:w-1/2 text-right">
+                        <h2 class="text-4xl font-black text-gray-900 mb-6">نبذة عن <span
+                                class="text-blue-600">المشروع</span></h2>
+                        <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                            نظام Health Tech هو منصة طبية شاملة تم تطويرها لتسهيل عملية حجز المواعيد الطبية وإدارة
+                            العيادات. يهدف المشروع إلى سد الفجوة بين المرضى ومقدمي الرعاية الصحية من خلال تقنيات ويب
+                            حديثة وآمنة.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <p class="text-gray-700 font-medium">نظام آمن ومحمي بأحدث التقنيات</p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <p class="text-gray-700 font-medium">تجربة مستخدم سهلة وسلسة</p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <p class="text-gray-700 font-medium">دعم فني متواصل</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -189,43 +296,180 @@ $specialties = get_all_specialties($conn);
             </div>
         </section>
 
-        <!-- Specialties Section -->
-        <section id="specialties" class="py-20">
+        <!-- How It Works Section -->
+        <section class="py-20 bg-white">
             <div class="container mx-auto px-4 text-center">
-                <h2 class="text-4xl font-black text-gray-800 mb-4">ابحث حسب التخصص</h2>
-                <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">نغطي كافة التخصصات الطبية لمساعدتك في العثور
-                    على الطبيب المناسب لحالتك الصحية.</p>
+                <h2 class="text-4xl font-black text-gray-900 mb-16">كيف يعمل <span class="text-blue-600">النظام</span>؟
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+                    <!-- Connecting Line (Desktop) -->
+                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-blue-100 -z-10 -translate-y-1/2">
+                    </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <?php
-                    $specialty_icons = [
-                        'fas fa-tooth',
-                        'fas fa-heartbeat',
-                        'fas fa-brain',
-                        'fas fa-baby',
-                        'fas fa-bone',
-                        'fas fa-allergies',
-                        'fas fa-eye',
-                        'fas fa-user-md'
-                    ];
-                    $i = 0;
-                    foreach (array_slice($specialties, 0, 8) as $specialty):
-                        ?>
-                        <a href="search.php?specialty=<?php echo $specialty['id']; ?>"
-                            class="block bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-xl hover:bg-blue-50 hover:-translate-y-2 transition-all duration-300 group">
-                            <div
-                                class="text-5xl text-blue-600 mb-4 transition-transform duration-300 group-hover:scale-110">
-                                <i class="<?php echo $specialty_icons[$i++ % count($specialty_icons)]; ?>"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-800"><?php echo htmlspecialchars($specialty['name']); ?>
-                            </h3>
-                        </a>
-                    <?php endforeach; ?>
+                    <!-- Step 1 -->
+                    <div
+                        class="relative bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition-transform duration-300">
+                        <div
+                            class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 border-4 border-white shadow-md">
+                            1</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">أنشئ حسابك</h3>
+                        <p class="text-gray-600 text-sm">سجل دخولك كمريض أو طبيب في خطوات بسيطة.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div
+                        class="relative bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition-transform duration-300">
+                        <div
+                            class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 border-4 border-white shadow-md">
+                            2</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">ابحث عن طبيب</h3>
+                        <p class="text-gray-600 text-sm">اختر التخصص والموقع المناسب لك.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div
+                        class="relative bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition-transform duration-300">
+                        <div
+                            class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 border-4 border-white shadow-md">
+                            3</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">احجز موعدك</h3>
+                        <p class="text-gray-600 text-sm">اختر الوقت المناسب من الجدول المتاح.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div
+                        class="relative bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition-transform duration-300">
+                        <div
+                            class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 border-4 border-white shadow-md">
+                            4</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">تم الحجز!</h3>
+                        <p class="text-gray-600 text-sm">احصل على تأكيد فوري وتذكير بموعدك.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Call to Action Section -->
+        <!-- Specialties Section -->
+        <section id="specialties" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-4xl font-black text-gray-800 mb-4">تصفح التخصصات الطبية</h2>
+                <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+                    اختر التخصص المناسب لحالتك من بين مجموعة واسعة من التخصصات الطبية المتاحة لدينا.
+                </p>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <?php
+                    $get_icon = function ($name) {
+                        $name = function_exists('mb_strtolower') ? mb_strtolower($name, 'UTF-8') : strtolower($name);
+
+                        $contains = function ($haystack, $needle) {
+                            return (function_exists('mb_strpos') ? mb_strpos($haystack, $needle) : strpos($haystack, $needle)) !== false;
+                        };
+
+                        if ($contains($name, 'أسنان'))
+                            return 'fas fa-tooth';
+                        if ($contains($name, 'قلب'))
+                            return 'fas fa-heartbeat';
+                        if ($contains($name, 'عيون'))
+                            return 'fas fa-eye';
+                        if ($contains($name, 'أطفال'))
+                            return 'fas fa-baby';
+                        if ($contains($name, 'عظام'))
+                            return 'fas fa-bone';
+                        if ($contains($name, 'جلد'))
+                            return 'fas fa-allergies';
+                        if ($contains($name, 'نفس') || $contains($name, 'مخ'))
+                            return 'fas fa-brain';
+                        if ($contains($name, 'جراح'))
+                            return 'fas fa-scalpel';
+                        if ($contains($name, 'نساء'))
+                            return 'fas fa-female';
+                        if ($contains($name, 'باطن'))
+                            return 'fas fa-stethoscope';
+                        if ($contains($name, 'أنف'))
+                            return 'fas fa-deaf';
+                        return 'fas fa-user-md';
+                    };
+
+                    foreach (array_slice($specialties, 0, 8) as $specialty):
+                        $icon = $get_icon($specialty['name']);
+                        $count = $specialty['doctor_count'] ?? 0;
+                    ?>
+                        <a href="search.php?specialty=<?php echo $specialty['id']; ?>"
+                            class="group block bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 hover:-translate-y-1">
+                            <div
+                                class="w-16 h-16 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors duration-300">
+                                <i
+                                    class="<?php echo $icon; ?> text-2xl text-blue-600 group-hover:text-white transition-colors duration-300"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                                <?php echo htmlspecialchars($specialty['name']); ?></h3>
+                            <p class="text-sm text-gray-500">
+                                <?php echo $count; ?> دكتور متاح
+                            </p>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="mt-12">
+                    <a href="search.php"
+                        class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors duration-300">
+                        عرض كل التخصصات
+                        <i class="fas fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- For Doctors Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="bg-blue-900 rounded-3xl overflow-hidden shadow-2xl">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 p-12 text-white">
+                            <h2 class="text-3xl md:text-4xl font-black mb-6">هل أنت مقدم رعاية صحية؟</h2>
+                            <p class="text-blue-200 text-lg mb-8">انضم إلى شبكتنا الطبية المتنامية وقم بإدارة عيادتك
+                                بكفاءة عالية. نوفر لك أدوات متقدمة لإدارة المواعيد وملفات المرضى.</p>
+                            <ul class="space-y-4 mb-8">
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                                    <span>إدارة جدول المواعيد بسهولة</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                                    <span>ملف تعريفي احترافي</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                                    <span>نظام تقييمات ومراجعات</span>
+                                </li>
+                            </ul>
+                            <a href="register.php?type=doctor"
+                                class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
+                                انضم كطبيب الآن
+                            </a>
+                        </div>
+                        <div
+                            class="md:w-1/2 bg-blue-800 h-full min-h-[400px] flex items-center justify-center relative overflow-hidden">
+                            <!-- Decorative Elements -->
+                            <div
+                                class="absolute top-0 right-0 w-64 h-64 bg-blue-700 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 w-48 h-48 bg-blue-600 rounded-full translate-y-1/2 -translate-x-1/2 opacity-50">
+                            </div>
+
+                            <div class="relative z-10 text-center p-8">
+                                <i class="fas fa-user-md text-9xl text-blue-400 opacity-80"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Section
         <section id="cta" class="bg-blue-600">
             <div class="container mx-auto px-4 py-20 text-center">
                 <h2 class="text-4xl md:text-5xl font-black text-white">جاهز لبدء رحلتك نحو صحة أفضل؟</h2>
@@ -242,7 +486,7 @@ $specialties = get_all_specialties($conn);
                     </a>
                 </div>
             </div>
-        </section>
+        </section> -->
 
     </main>
 

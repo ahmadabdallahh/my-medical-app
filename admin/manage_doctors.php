@@ -171,9 +171,9 @@ $page_title = "إدارة الأطباء";
                                                         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                                                         <input type="hidden" name="user_id" value="<?php echo $doctor['user_id']; ?>">
                                                         <select name="new_status" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 px-3 py-2 min-w-[140px] shadow-sm hover:border-gray-400 transition-colors">
-                                                            <option value="approved" <?php echo (!empty($doctor['doctor_id']) && $doctor['is_active'] == 1) ? 'selected' : ''; ?>>معتمد</option>
-                                                            <option value="pending" <?php echo (empty($doctor['doctor_id'])) ? 'selected' : ''; ?>>معلق</option>
-                                                            <option value="suspended" <?php echo (!empty($doctor['doctor_id']) && $doctor['is_active'] == 0) ? 'selected' : ''; ?>>موقوف</option>
+                                                            <option value="approved" <?php if (isset($doctor['status']) && $doctor['status'] == 'approved') echo 'selected'; ?>>معتمد</option>
+                                                            <option value="pending" <?php if (!isset($doctor['status']) || $doctor['status'] == 'pending') echo 'selected'; ?>>معلق</option>
+                                                            <option value="suspended" <?php if (isset($doctor['status']) && $doctor['status'] == 'suspended') echo 'selected'; ?>>موقوف</option>
                                                         </select>
                                                         <button type="submit" name="update_status" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-1">
                                                             <i class="fas fa-save text-xs"></i>

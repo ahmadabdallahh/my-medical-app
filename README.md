@@ -69,7 +69,15 @@
 - **Font Awesome**: الأيقونات
 - **Responsive Design**: تصميم متجاوب
 
-### الأمان
+### 📝 بيانات الحسابات
+
+| Account Type    | Email                  | Password         |
+|-----------------|------------------------|------------------|
+| Patient Account | `testt@email.com`      | `agagdasdg44DD@@#` |
+| Admin Account   | `admin@shifa.com`      | `admin123`       |
+| Doctor Account  | `dr.ahmed@medical.com` | `doctor123`      |
+
+### 🔐 الأمان
 
 - **Password Hashing**: تشفير كلمات المرور
 - **SQL Injection Protection**: حماية من حقن SQL

@@ -35,26 +35,26 @@ try {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_availability']) && $table_exists) {
     // Clear existing availability
     $conn->prepare("DELETE FROM doctor_availability WHERE doctor_id = ?")->execute([$doctor_id]);
-    
+
     // Insert new availability
     $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-    
+
     foreach ($days as $day) {
         if (isset($_POST[$day . '_enabled']) && $_POST[$day . '_enabled'] == 'on') {
             $start_time = sanitize_input($_POST[$day . '_start']);
             $end_time = sanitize_input($_POST[$day . '_end']);
             $slot_duration = (int)$_POST['slot_duration'];
-            
+
             if (!empty($start_time) && !empty($end_time)) {
                 $stmt = $conn->prepare("
-                    INSERT INTO doctor_availability (doctor_id, day_of_week, start_time, end_time, slot_duration) 
+                    INSERT INTO doctor_availability (doctor_id, day_of_week, start_time, end_time, slot_duration)
                     VALUES (?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([$doctor_id, $day, $start_time, $end_time, $slot_duration]);
             }
         }
     }
-    
+
     $success = 'تم تحديث مواعيد العمل بنجاح';
 }
 
@@ -65,7 +65,7 @@ if ($table_exists) {
         $stmt = $conn->prepare("SELECT * FROM doctor_availability WHERE doctor_id = ?");
         $stmt->execute([$doctor_id]);
         $availability = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         foreach ($availability as $avail) {
             $availability_map[$avail['day_of_week']] = $avail;
         }
@@ -93,28 +93,30 @@ $days_arabic = [
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?></title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts (Cairo) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         body {
             font-family: 'Cairo', sans-serif;
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
 
     <!-- Navigation -->
@@ -127,7 +129,7 @@ $days_arabic = [
                         <span class="text-xl font-bold text-gray-800">Health Tech</span>
                     </a>
                 </div>
-                
+
                 <div class="flex items-center space-x-4 space-x-reverse">
                     <span class="text-gray-600">
                         <i class="fas fa-user-md text-blue-600 ml-2"></i>
@@ -150,33 +152,33 @@ $days_arabic = [
         <aside class="w-64 bg-white shadow-lg min-h-screen">
             <div class="p-4">
                 <h3 class="text-lg font-bold text-gray-800 mb-6">لوحة التحكم</h3>
-                
+
                 <nav class="space-y-2">
                     <a href="index.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-home ml-3"></i>
                         الرئيسية
                     </a>
-                    
+
                     <a href="appointments.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-calendar-check ml-3"></i>
                         المواعيد
                     </a>
-                    
+
                     <a href="profile.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-user-circle ml-3"></i>
                         الملف الشخصي
                     </a>
-                    
+
                     <a href="availability.php" class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                         <i class="fas fa-clock ml-3"></i>
                         مواعيد العمل
                     </a>
-                    
+
                     <a href="../search.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-search ml-3"></i>
                         البحث عن أطباء
                     </a>
-                    
+
                     <a href="../index.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-globe ml-3"></i>
                         الموقع الرئيسي
@@ -200,7 +202,7 @@ $days_arabic = [
                     <?php echo $success; ?>
                 </div>
             <?php endif; ?>
-            
+
             <?php if ($error): ?>
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
                     <i class="fas fa-exclamation-circle ml-2"></i>
@@ -228,119 +230,93 @@ $days_arabic = [
                 </div>
             <?php else: ?>
 
-            <!-- Availability Form -->
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">مواعيد العمل الأسبوعية</h2>
-                
-                <form method="POST" action="" class="space-y-6">
-                    <!-- Slot Duration -->
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-clock ml-2"></i>
-                            مدة كل موعد (بالدقائق)
-                        </label>
-                        <select name="slot_duration" class="w-full md:w-48 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="15" <?php echo $default_slot_duration == 15 ? 'selected' : ''; ?>>15 دقيقة</option>
-                            <option value="30" <?php echo $default_slot_duration == 30 ? 'selected' : ''; ?>>30 دقيقة</option>
-                            <option value="45" <?php echo $default_slot_duration == 45 ? 'selected' : ''; ?>>45 دقيقة</option>
-                            <option value="60" <?php echo $default_slot_duration == 60 ? 'selected' : ''; ?>>60 دقيقة</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Days Schedule -->
-                    <div class="space-y-4">
-                        <?php foreach ($days_arabic as $day_en => $day_ar): ?>
-                            <?php 
-                            $avail = $availability_map[$day_en] ?? null;
-                            $is_enabled = $avail ? true : false;
-                            $start_time = $avail['start_time'] ?? '09:00';
-                            $end_time = $avail['end_time'] ?? '17:00';
-                            ?>
-                            
-                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" 
-                                               name="<?php echo $day_en; ?>_enabled" 
-                                               id="<?php echo $day_en; ?>_enabled"
-                                               <?php echo $is_enabled ? 'checked' : ''; ?>
-                                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                               onchange="toggleDay('<?php echo $day_en; ?>')">
-                                        <label for="<?php echo $day_en; ?>_enabled" class="mr-3 text-lg font-semibold text-gray-900">
-                                            <?php echo $day_ar; ?>
-                                        </label>
-                                    </div>
-                                    
-                                    <?php if ($is_enabled): ?>
-                                        <span class="text-sm text-green-600 font-medium">
-                                            <i class="fas fa-check-circle ml-1"></i>
-                                            متاح
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="text-sm text-gray-500 font-medium">
-                                            <i class="fas fa-times-circle ml-1"></i>
-                                            مغلق
-                                        </span>
-                                    <?php endif; ?>
-                                </div>
-                                
-                                <div id="<?php echo $day_en; ?>_times" class="grid grid-cols-1 md:grid-cols-2 gap-4 <?php echo $is_enabled ? '' : 'opacity-50 pointer-events-none'; ?>">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">وقت البدء</label>
-                                        <input type="time" 
-                                               name="<?php echo $day_en; ?>_start" 
-                                               value="<?php echo $start_time; ?>"
-                                               class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">وقت الانتهاء</label>
-                                        <input type="time" 
-                                               name="<?php echo $day_en; ?>_end" 
-                                               value="<?php echo $end_time; ?>"
-                                               class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    
-                    <div class="flex justify-end pt-4">
-                        <button type="submit" name="update_availability" 
-                                class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-save ml-2"></i>
-                            حفظ مواعيد العمل
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <?php endif; ?>
+                <!-- Availability Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">مواعيد العمل الأسبوعية</h2>
 
-            <!-- Info Card -->
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <h3 class="text-lg font-semibold text-blue-900 mb-3">
-                    <i class="fas fa-info-circle ml-2"></i>
-                    معلومات هامة
-                </h3>
-                <ul class="space-y-2 text-blue-800">
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-blue-600 ml-2 mt-1"></i>
-                        <span>حدد الأيام والساعات التي تتوفر فيها لاستقبال المرضى</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-blue-600 ml-2 mt-1"></i>
-                        <span>سيتمكن المرضى من حجز المواعيد فقط في الأوقات المحددة</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-blue-600 ml-2 mt-1"></i>
-                        <span>يمكنك تعديل مواعيد العمل في أي وقت</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-blue-600 ml-2 mt-1"></i>
-                        <span>مدة الموعد تحدد عدد المواعيد المتاحة في الساعة</span>
-                    </li>
-                </ul>
-            </div>
+                    <form method="POST" action="" class="space-y-6">
+                        <!-- Slot Duration -->
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-clock ml-2"></i>
+                                مدة كل موعد (بالدقائق)
+                            </label>
+                            <select name="slot_duration" class="w-full md:w-48 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="15" <?php echo $default_slot_duration == 15 ? 'selected' : ''; ?>>15 دقيقة</option>
+                                <option value="30" <?php echo $default_slot_duration == 30 ? 'selected' : ''; ?>>30 دقيقة</option>
+                                <option value="45" <?php echo $default_slot_duration == 45 ? 'selected' : ''; ?>>45 دقيقة</option>
+                                <option value="60" <?php echo $default_slot_duration == 60 ? 'selected' : ''; ?>>60 دقيقة</option>
+                            </select>
+                        </div>
+
+                        <!-- Days Schedule -->
+                        <div class="space-y-4">
+                            <?php foreach ($days_arabic as $day_en => $day_ar): ?>
+                                <?php
+                                $avail = $availability_map[$day_en] ?? null;
+                                $is_enabled = $avail ? true : false;
+                                $start_time = $avail['start_time'] ?? '09:00';
+                                $end_time = $avail['end_time'] ?? '17:00';
+                                ?>
+
+                                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <input type="checkbox"
+                                                name="<?php echo $day_en; ?>_enabled"
+                                                id="<?php echo $day_en; ?>_enabled"
+                                                <?php echo $is_enabled ? 'checked' : ''; ?>
+                                                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                onchange="toggleDay('<?php echo $day_en; ?>')">
+                                            <label for="<?php echo $day_en; ?>_enabled" class="mr-3 text-lg font-semibold text-gray-900">
+                                                <?php echo $day_ar; ?>
+                                            </label>
+                                        </div>
+
+                                        <?php if ($is_enabled): ?>
+                                            <span class="text-sm text-green-600 font-medium">
+                                                <i class="fas fa-check-circle ml-1"></i>
+                                                متاح
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-sm text-gray-500 font-medium">
+                                                <i class="fas fa-times-circle ml-1"></i>
+                                                مغلق
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <div id="<?php echo $day_en; ?>_times" class="grid grid-cols-1 md:grid-cols-2 gap-4 <?php echo $is_enabled ? '' : 'opacity-50 pointer-events-none'; ?>">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">وقت البدء</label>
+                                            <input type="time"
+                                                name="<?php echo $day_en; ?>_start"
+                                                value="<?php echo $start_time; ?>"
+                                                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">وقت الانتهاء</label>
+                                            <input type="time"
+                                                name="<?php echo $day_en; ?>_end"
+                                                value="<?php echo $end_time; ?>"
+                                                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" name="update_availability"
+                                class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-save ml-2"></i>
+                                حفظ مواعيد العمل
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            <?php endif; ?>
 
             <!-- Quick Actions -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -349,7 +325,7 @@ $days_arabic = [
                     <h3 class="font-semibold text-gray-900">عرض المواعيد</h3>
                     <p class="text-gray-600 text-sm mt-2">شاهد جميع المواعيد المحجوزة</p>
                 </a>
-                
+
                 <a href="/App-Demo/doctor/index.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
                     <i class="fas fa-arrow-left text-blue-600 text-3xl mb-3"></i>
                     <h3 class="font-semibold text-gray-900">العودة للرئيسية</h3>
@@ -363,14 +339,14 @@ $days_arabic = [
         function toggleDay(day) {
             const checkbox = document.getElementById(day + '_enabled');
             const timesDiv = document.getElementById(day + '_times');
-            
+
             if (checkbox.checked) {
                 timesDiv.classList.remove('opacity-50', 'pointer-events-none');
             } else {
                 timesDiv.classList.add('opacity-50', 'pointer-events-none');
             }
         }
-        
+
         // Initialize all days
         document.addEventListener('DOMContentLoaded', function() {
             const days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -381,4 +357,5 @@ $days_arabic = [
     </script>
 
 </body>
+
 </html>

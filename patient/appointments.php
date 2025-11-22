@@ -298,7 +298,11 @@ $pageTitle = 'مواعيــدي';
         </div>
     </main>
 
-    <?php
-    require_once '../includes/footer.php';
-    ?>
+    <div class="mt-8">
+    <?php require_once '../includes/footer.php'; ?>
+</div>
+
+</body>
+
+</html>
 

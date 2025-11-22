@@ -46,7 +46,7 @@ $base_path = $is_subdir ? '../' : '';
                 <ul class="space-y-3 text-gray-400">
                     <li class="flex items-center justify-center md:justify-start">
                         <i class="fas fa-map-marker-alt ml-3"></i>
-                        <span>القاهرة, مصر</span>
+                        <span>دمنهور, البحيرة</span>
                     </li>
                     <li class="flex items-center justify-center md:justify-start">
                         <i class="fas fa-phone-alt ml-3"></i>

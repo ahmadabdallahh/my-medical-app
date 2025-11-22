@@ -1730,7 +1730,7 @@ function get_hospital_display_image(array $hospital): string
     $name = $hospital['name'] ?? '';
     $default_image = get_default_hospital_image();
     $imageMap = [
-        'مستشفى القاهرة العام' => 'https://images.pexels.com/photos/2324837/pexels-photo-2324837.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'مستشفى دمنهور العام' => 'https://images.pexels.com/photos/2324837/pexels-photo-2324837.jpeg?auto=compress&cs=tinysrgb&w=1200',
         'مستشفى المعادي' => 'https://images.pexels.com/photos/247786/pexels-photo-247786.jpeg?auto=compress&cs=tinysrgb&w=1200',
         'مستشفى مصر الجديدة' => 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=1200',
         'مستشفى الإسكندرية العام' => 'https://images.pexels.com/photos/208490/pexels-photo-208490.jpeg?auto=compress&cs=tinysrgb&w=1200',

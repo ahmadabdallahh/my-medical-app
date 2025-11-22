@@ -6,7 +6,7 @@ require_once '../includes/functions.php';
 
 // Check if the user is a doctor, otherwise redirect to login
 if (!is_logged_in() || $_SESSION['user_type'] !== 'doctor') {
-    header('Location: /App-Demo/login.php');
+    header('Location: ../login.php');
     exit();
 }
 
@@ -36,7 +36,7 @@ try {
 
 // If doctor_id not found, redirect
 if (!$doctor_id) {
-    header('Location: /App-Demo/login.php?error=doctor_not_found');
+    header('Location: ../login.php?error=doctor_not_found');
     exit();
 }
 

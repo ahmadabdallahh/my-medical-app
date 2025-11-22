@@ -21,36 +21,47 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // 3. Validate incoming data
-$doctor_user_id = filter_input(INPUT_POST, 'doctor_id', FILTER_VALIDATE_INT);
+$doctor_input_id = filter_input(INPUT_POST, 'doctor_id', FILTER_VALIDATE_INT);
 $appointment_date = filter_input(INPUT_POST, 'appointment_date');
 $appointment_time = filter_input(INPUT_POST, 'appointment_time');
 $clinic_id = filter_input(INPUT_POST, 'clinic_id', FILTER_VALIDATE_INT);
 
-// 4. Basic validation
-if (!$doctor_user_id || !$appointment_date || !$appointment_time || !$clinic_id) {
+// 4. Basic validation (clinic_id may be derived later)
+if (!$doctor_input_id || !$appointment_date || !$appointment_time) {
     $_SESSION['error_message'] = 'بيانات الحجز غير مكتملة.';
-    header('Location: book_appointment.php?doctor_id=' . $doctor_user_id);
+    header('Location: book_appointment.php?doctor_id=' . (int)$doctor_input_id);
     exit();
 }
 
-// 5. Get the real doctor_id from doctors table (convert from users.id)
+// 5. Normalize doctor_id: accept either doctors.id or users.id and resolve to doctors.id
 try {
-    $stmt = $conn->prepare("SELECT id FROM doctors WHERE user_id = ?");
-    $stmt->execute([$doctor_user_id]);
+    // First, try treating input as a doctors.id
+    $stmt = $conn->prepare("SELECT id, clinic_id FROM doctors WHERE id = ?");
+    $stmt->execute([$doctor_input_id]);
     $doctor_record = $stmt->fetch();
 
     if (!$doctor_record) {
+        // If not found, treat input as users.id and convert to doctors.id
+        $stmt = $conn->prepare("SELECT id, clinic_id FROM doctors WHERE user_id = ?");
+        $stmt->execute([$doctor_input_id]);
+        $doctor_record = $stmt->fetch();
+    }
+
+    if (!$doctor_record) {
         $_SESSION['error_message'] = 'الطبيب المحدد غير موجود.';
-        header('Location: book_appointment.php?doctor_id=' . $doctor_user_id);
+        header('Location: book_appointment.php?doctor_id=' . (int)$doctor_input_id);
         exit();
     }
 
-    $doctor_id = $doctor_record['id'];
-
+    $doctor_id = (int)$doctor_record['id'];
+    // Fallback clinic_id to doctor's clinic if not provided
+    if (!$clinic_id) {
+        $clinic_id = isset($doctor_record['clinic_id']) ? (int)$doctor_record['clinic_id'] : null;
+    }
 } catch (PDOException $e) {
     error_log('Doctor lookup error: ' . $e->getMessage());
     $_SESSION['error_message'] = 'حدث خطأ في العثور على بيانات الطبيب.';
-    header('Location: book_appointment.php?doctor_id=' . $doctor_user_id);
+    header('Location: book_appointment.php?doctor_id=' . (int)$doctor_input_id);
     exit();
 }
 
@@ -62,7 +73,7 @@ try {
     $stmt->execute([$user_id, $doctor_id, $appointment_date, $appointment_time]);
     if ($stmt->fetch()) {
         $_SESSION['error_message'] = 'لقد قمت بحجز هذا الموعد من قبل.';
-        header('Location: book_appointment.php?doctor_id=' . $doctor_user_id);
+        header('Location: book_appointment.php?doctor_id=' . (int)$doctor_input_id);
         exit();
     }
 } catch (PDOException $e) {
@@ -83,7 +94,7 @@ try {
 
 if (!$is_still_available) {
     $_SESSION['error_message'] = 'عذراً، هذا الموعد تم حجزه للتو. الرجاء اختيار موعد آخر.';
-    header('Location: book_appointment.php?doctor_id=' . $doctor_user_id);
+    header('Location: book_appointment.php?doctor_id=' . (int)$doctor_input_id);
     exit();
 }
 
@@ -97,10 +108,9 @@ try {
     $_SESSION['success_message'] = 'تم تأكيد حجزك بنجاح!';
     header('Location: patient/index.php'); // Assuming a patient dashboard exists
     exit();
-
 } catch (PDOException $e) {
     error_log('Booking submission error: ' . $e->getMessage());
     $_SESSION['error_message'] = 'حدث خطأ فني أثناء تأكيد الحجز. الرجاء المحاولة لاحقاً.';
-    header('Location: book_appointment.php?doctor_id=' . $doctor_user_id);
+    header('Location: book_appointment.php?doctor_id=' . (int)$doctor_input_id);
     exit();
 }

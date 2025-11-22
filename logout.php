@@ -7,6 +7,6 @@ session_unset();
 session_destroy();
 
 // Redirect to home page
-header('Location: /App-Demo/index.php');
+header('Location: /medical-app-test/index.php');
 exit();
 ?>

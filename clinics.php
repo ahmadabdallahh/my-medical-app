@@ -389,7 +389,7 @@ $page_title = "عيادات " . htmlspecialchars($hospital['name'], ENT_QUOTES, 
                     <ul class="space-y-3 text-gray-400">
                         <li class="flex items-center justify-center md:justify-start gap-3">
                             <i class="fas fa-map-marker-alt text-blue-400"></i>
-                            <span>القاهرة، مصر</span>
+                            <span>دمنهور، البحيرة</span>
                         </li>
                         <li class="flex items-center justify-center md:justify-start gap-3">
                             <i class="fas fa-phone text-blue-400"></i>
