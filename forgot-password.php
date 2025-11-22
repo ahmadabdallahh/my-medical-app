@@ -32,11 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($user) {
                 // إنشاء رمز إعادة تعيين كلمة المرور
                 $token = bin2hex(random_bytes(32));
-                $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-                // حفظ الرمز في قاعدة البيانات
-                $stmt = $conn->prepare("INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)");
-                $stmt->execute([$user['id'], $token, $expires_at]);
+                // حفظ الرمز في قاعدة البيانات - استخدام DATE_ADD في MySQL لتجنب مشاكل المنطقة الزمنية
+                $stmt = $conn->prepare("INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))");
+                $stmt->execute([$user['id'], $token]);
 
                 // إرسال البريد الإلكتروني باستخدام PHPMailer
                 $reset_link = "http://localhost/medical-app-test/reset-password.php?token=" . $token;
@@ -61,11 +60,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // المحتوى
                     $mail->isHTML(true);
                     $mail->Subject = 'إعادة تعيين كلمة المرور الخاصة بك';
-                    $mail->Body    = "<p>مرحباً،</p><p>لقد طلبت إعادة تعيين كلمة المرور الخاصة بك. انقر على الرابط التالي لإكمال العملية:</p><p><a href='{$reset_link}'>{$reset_link}</a></p><p>إذا لم تطلب هذا، يرجى تجاهل هذا البريد الإلكتروني.</p>";
-                    $mail->AltBody = "مرحباً،\nلقد طلبت إعادة تعيين كلمة المرور الخاصة بك. يرجى نسخ ولصق الرابط التالي في متصفحك لإكمال العملية:\n{$reset_link}\nإذا لم تطلب هذا، يرجى تجاهل هذا البريد الإلكتروني.";
+                    $mail->Body    = '
+                        <div style="font-family: \'Segoe UI\', \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6; background-color: #f4f7f6; padding: 30px 0;">
+                            <div style="max-width: 600px; margin: 0 auto; padding: 0; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); overflow: hidden;">
+                                <div style="background-color: #0EA5E9; padding: 25px 20px; text-align: center; color: #ffffff;">
+                                    <h1 style="margin: 0; font-size: 28px; font-weight: 600;">إعادة تعيين كلمة المرور</h1>
+                                </div>
+                                <div style="padding: 30px 40px;">
+                                    <p style="margin-top: 0;">مرحباً،</p>
+                                    <p>لقد طلبت إعادة تعيين كلمة المرور الخاصة بك. انقر على الزر أدناه لإكمال العملية:</p>
+                                    <p style="text-align: center; margin: 35px 0;">
+                                        <a href="' . $reset_link . '" style="display: inline-block; padding: 15px 30px; background-color: #0EA5E9; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold; transition: background-color 0.3s ease;">
+                                            إعادة تعيين كلمة المرور
+                                        </a>
+                                    </p>
+                                    <p>إذا لم تتمكن من النقر على الزر، يمكنك نسخ ولصق الرابط التالي في متصفحك:</p>
+                                    <p style="word-break: break-all; font-size: 14px; background-color: #eef; padding: 10px; border-radius: 5px;"><a href="' . $reset_link . '" style="color: #0EA5E9; text-decoration: none;">' . $reset_link . '</a></p>
+                                    <p>إذا لم تطلب إعادة تعيين كلمة المرور هذه، يرجى تجاهل هذا البريد الإلكتروني.</p>
+                                    <p style="margin-bottom: 0;">شكراً لك،<br>فريق دعم موقع حجز المواعيد الطبية</p>
+                                </div>
+                                <div style="background-color: #f0f0f0; padding: 20px 40px; text-align: center; font-size: 13px; color: #777; border-top: 1px solid #e0e0e0;">
+                                    <p style="margin: 0;">هذا البريد الإلكتروني مرسل تلقائيًا، يرجى عدم الرد عليه.</p>
+                                </div>
+                            </div>
+                        </div>';
+                    $mail->AltBody = "مرحباً،\n\nلقد طلبت إعادة تعيين كلمة المرور الخاصة بك. يرجى نسخ ولصق الرابط التالي في متصفحك لإكمال العملية:\n{$reset_link}\n\nإذا لم تطلب هذا، يرجى تجاهل هذا البريد الإلكتروني.";
 
                     $mail->send();
-                    $message = 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد الخاص بك.';
+                    $message = 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد الخاص بك';
                     $message_type = 'success';
 
                 } catch (Exception $e) {
@@ -95,12 +117,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-blue: #0EA5E9;
+            --medical-green: #10B981;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --radius: 8px;
+            --radius-xl: 16px;
+            --transition: all 0.3s ease;
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         .auth-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--medical-green) 100%);
             padding: 2rem 1rem;
         }
 
@@ -189,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .form-group input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
 
         .btn {

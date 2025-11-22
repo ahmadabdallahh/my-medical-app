@@ -393,7 +393,7 @@ $specialties = get_all_specialties($conn);
                     foreach (array_slice($specialties, 0, 8) as $specialty):
                         $icon = $get_icon($specialty['name']);
                         $count = $specialty['doctor_count'] ?? 0;
-                        ?>
+                    ?>
                         <a href="search.php?specialty=<?php echo $specialty['id']; ?>"
                             class="group block bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 hover:-translate-y-1">
                             <div
@@ -501,7 +501,7 @@ $specialties = get_all_specialties($conn);
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-2">راسلنا عبر البريد</h3>
                         <p class="text-gray-600 mb-4">نرد في غضون 24 ساعة</p>
-                        <a href="mailto:support@healthtech.com" class="text-green-600 font-bold text-lg hover:text-green-700">support@healthtech.com</a>
+                        <a href="mailto:healthh.tech404@gmail.com" class="text-green-600 font-bold text-lg hover:text-green-700">healthh.tech404@gmail.com</a>
                     </div>
 
                     <!-- Location Contact -->
@@ -516,20 +516,34 @@ $specialties = get_all_specialties($conn);
                     </div>
                 </div>
             </div>
-            
+
             <style>
                 @keyframes blob {
-                    0% { transform: translate(0px, 0px) scale(1); }
-                    33% { transform: translate(30px, -50px) scale(1.1); }
-                    66% { transform: translate(-20px, 20px) scale(0.9); }
-                    100% { transform: translate(0px, 0px) scale(1); }
+                    0% {
+                        transform: translate(0px, 0px) scale(1);
+                    }
+
+                    33% {
+                        transform: translate(30px, -50px) scale(1.1);
+                    }
+
+                    66% {
+                        transform: translate(-20px, 20px) scale(0.9);
+                    }
+
+                    100% {
+                        transform: translate(0px, 0px) scale(1);
+                    }
                 }
+
                 .animate-blob {
                     animation: blob 7s infinite;
                 }
+
                 .animation-delay-2000 {
                     animation-delay: 2s;
                 }
+
                 .animate-bounce-slow {
                     animation: bounce 2s infinite;
                 }

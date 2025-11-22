@@ -17,7 +17,7 @@ try {
     $conn = $db->getConnection();
 
     // التحقق من صحة الرمز
-    $stmt = $conn->prepare("SELECT * FROM password_reset_tokens WHERE token = ? AND used = FALSE AND expires_at > NOW()");
+    $stmt = $conn->prepare("SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0 AND expires_at > NOW()");
     $stmt->execute([$token]);
     $token_data = $stmt->fetch();
 
@@ -41,7 +41,7 @@ try {
 
                 if ($update_stmt->execute([$hashed_password, $token_data['user_id']])) {
                     // تمييز الرمز بأنه مستخدم
-                    $used_stmt = $conn->prepare("UPDATE password_reset_tokens SET used = TRUE WHERE id = ?");
+                    $used_stmt = $conn->prepare("UPDATE password_reset_tokens SET used = 1 WHERE id = ?");
                     $used_stmt->execute([$token_data['id']]);
 
                     $success = 'تم تحديث كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.';
@@ -66,6 +66,18 @@ try {
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-blue: #0EA5E9;
+            --medical-green: #10B981;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --radius: 8px;
+            --radius-xl: 16px;
+            --transition: all 0.3s ease;
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
         .auth-container {
             min-height: 100vh;
             display: flex;
@@ -129,7 +141,7 @@ try {
         .form-group input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
 
         .btn {

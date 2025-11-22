@@ -59,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -72,47 +71,106 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #aaa;
+            font-size: 1.2rem;
+        }
+
+        .toggle-visibility:hover {
+            color: #6c84ee;
+        }
+    </style>
 </head>
 
 <body>
     <div class="login-container">
         <div class="login-box">
+            <!-- Image Section (Right Side) -->
             <div class="image-section">
                 <div class="image-content">
-                    <img src="assets/images/doctor-illustration.png" alt="Doctor Illustration">
-                    <div class="welcome-text">
-                        <h2>أهلاً بعودتك!</h2>
-                        <p>من فضلك أدخل بياناتك للمتابعة</p>
-                    </div>
+                    <img src="assets/images/doctor-illustration.png" alt="Login Illustration"
+                        onerror="this.style.display='none'">
+                </div>
+                <div class="welcome-text">
+                    <h2>أهلاً بعودتك!</h2>
+                    <p>سجل دخولك للوصول إلى حسابك</p>
                 </div>
             </div>
+
+            <!-- Form Section (Left Side) -->
             <div class="form-section">
                 <div class="form-content">
+                    <!-- Logo -->
                     <div class="logo">
                         <i class="fas fa-heartbeat"></i>
                         <span>Health Tech</span>
                     </div>
+
                     <h3>تسجيل الدخول</h3>
+
+                    <!-- Error Message -->
+                    <?php if (!empty($error)): ?>
+                        <div class="form-group error">
+                            <span class="error-message">
+                                <i class="fas fa-exclamation-circle"></i> <?php echo $error; ?>
+                            </span>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Login Form -->
                     <form method="POST" action="login.php">
+                        <!-- Email Input -->
                         <div class="form-group">
-                            <label for="email">اسم المستخدم أو البريد الإلكتروني</label>
-                            <input type="email" id="email" name="email" value="<?php echo $email_value; ?>" required>
+                            <label for="email">
+                                <i class="fas fa-envelope"></i> البريد الإلكتروني
+                            </label>
+                            <input type="email" id="email" name="email" value="<?php echo $email_value; ?>"
+                                placeholder="example@email.com" required>
                         </div>
-                        <div class="form-group <?php echo !empty($error) ? 'error' : ''; ?>">
-                            <label for="password">كلمة المرور</label>
+
+                        <!-- Password Input -->
+                        <div class="form-group">
+                            <label for="password">
+                                <i class="fas fa-lock"></i> كلمة المرور
+                            </label>
                             <div class="password-wrapper">
-                                <input type="password" id="password" name="password" required>
-                                <i class="fas fa-eye-slash toggle-password"></i>
+                                <input type="password" id="password" name="password" placeholder="••••••••" required>
+                                <i class="fas fa-eye-slash toggle-visibility" id="togglePassword"
+                                    onclick="togglePasswordVisibility()"></i>
                             </div>
-                            <?php if (!empty($error)): ?>
-                                <span class="error-message"><?php echo $error; ?></span>
-                            <?php endif; ?>
                         </div>
-                        <button type="submit" class="btn-login">تسجيل الدخول</button>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <label style="display: flex; align-items: center; gap: 8px; margin: 0; font-weight: normal;">
+                                <input type="checkbox" name="remember" style="width: auto; margin: 0;">
+                                <span>تذكرني</span>
+                            </label>
+                            <a href="forgot-password.php" style="color: #6c84ee; text-decoration: none; font-size: 0.9rem;">
+                                نسيت كلمة المرور؟
+                            </a>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn-login">
+                            <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                        </button>
                     </form>
+
+                    <!-- Links -->
                     <div class="links">
-                        <a href="forgot-password.php">نسيت كلمة المرور؟</a>
                         <p>ليس لديك حساب؟ <a href="register.php">سجل الآن</a></p>
+                        <p><a href="index.php"><i class="fas fa-arrow-right"></i> العودة للصفحة الرئيسية</a></p>
                     </div>
                 </div>
             </div>
@@ -120,13 +178,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script>
-        document.querySelector('.toggle-password').addEventListener('click', function(e) {
+        function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-        });
+            const toggleIcon = document.getElementById('togglePassword');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            }
+        }
     </script>
 </body>
 
