@@ -1658,6 +1658,29 @@ function get_doctor_upcoming_appointments($pdo, $doctor_user_id, $limit = 5)
         return [];
     }
 }
+
+function get_doctor_schedule($doctor_id)
+{
+    try {
+        $db = new Database();
+        $conn = $db->getConnection();
+
+        // doctor_availability table uses user_id as doctor_id
+        // So we need to join with doctors table to match the doctor_id (PK) passed to this function
+        $stmt = $conn->prepare("
+            SELECT da.* 
+            FROM doctor_availability da
+            JOIN doctors d ON da.doctor_id = d.user_id
+            WHERE d.id = ? AND da.is_active = 1
+            ORDER BY FIELD(da.day_of_week, 'saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+        ");
+        $stmt->execute([$doctor_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Get doctor schedule error: " . $e->getMessage());
+        return [];
+    }
+}
 //</editor-fold>
 
 // ====================================================================
@@ -1879,6 +1902,31 @@ function get_user_appointments($pdo, $user_id)
 // ====================================================================
 // RATING AND REVIEW FUNCTIONS
 
+function get_doctor_reviews($doctor_id, $limit = 5)
+{
+    try {
+        $db = new Database();
+        $conn = $db->getConnection();
+
+        $stmt = $conn->prepare("
+            SELECT dr.*, u.full_name as user_name 
+            FROM doctor_ratings dr
+            JOIN users u ON dr.user_id = u.id
+            WHERE dr.doctor_id = ?
+            ORDER BY dr.created_at DESC
+            LIMIT ?
+        ");
+        $stmt->execute([$doctor_id, $limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Get doctor reviews error: " . $e->getMessage());
+        return [];
+    }
+}
+
+// ====================================================================
+// RATING AND REVIEW FUNCTIONS
+
 function get_doctor_ratings($pdo, $doctor_id, $limit = 10, $offset = 0)
 {
     try {
@@ -2040,6 +2088,59 @@ function get_status_arabic($status)
     ];
 
     return $status_map[$status] ?? $status;
+}
+
+
+// ====================================================================
+// BOOKING HELPER FUNCTIONS
+
+function is_appointment_available($doctor_id, $date, $time)
+{
+    try {
+        $db = new Database();
+        $conn = $db->getConnection();
+
+        $stmt = $conn->prepare("SELECT id FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ? AND status != 'cancelled'");
+        $stmt->execute([$doctor_id, $date, $time]);
+        
+        return !$stmt->fetch();
+    } catch (PDOException $e) {
+        error_log("Availability check error: " . $e->getMessage());
+        return false;
+    }
+}
+
+function book_appointment($user_id, $doctor_id, $clinic_id, $date, $time, $notes = '')
+{
+    try {
+        $db = new Database();
+        $conn = $db->getConnection();
+
+        $sql = "INSERT INTO appointments (user_id, doctor_id, clinic_id, appointment_date, appointment_time, notes, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'confirmed', NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$user_id, $doctor_id, $clinic_id, $date, $time, $notes]);
+
+        return $conn->lastInsertId();
+    } catch (PDOException $e) {
+        error_log("Booking error: " . $e->getMessage());
+        return false;
+    }
+}
+
+function send_notification($user_id, $title, $message, $type = 'system')
+{
+    try {
+        $db = new Database();
+        $conn = $db->getConnection();
+
+        $stmt = $conn->prepare("INSERT INTO push_notifications (user_id, title, message, type, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([$user_id, $title, $message, $type]);
+
+        return true;
+    } catch (PDOException $e) {
+        error_log("Notification error: " . $e->getMessage());
+        return false;
+    }
 }
 
 ?>

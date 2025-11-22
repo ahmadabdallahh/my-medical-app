@@ -305,7 +305,7 @@ $page_title = "أطباء " . htmlspecialchars($clinic['name']);
                                             <i class="fas fa-eye ml-2"></i>
                                             التفاصيل
                                         </a>
-                                        <a href="book.php?doctor=<?php echo $doctor['id']; ?>&clinic=<?php echo $clinic_id; ?>"
+                                        <a href="book_appointment.php?doctor_id=<?php echo $doctor['id']; ?>"
                                             class="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-3 px-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 text-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                                             <i class="fas fa-calendar-plus ml-2"></i>
                                             حجز موعد

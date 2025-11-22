@@ -101,8 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (empty($form_data['user_type'])) $errors['user_type'] = 'يرجى تحديد نوع الحساب';
 
-        if (empty($form_data['gender']) || !in_array($form_data['gender'], ['male', 'female'])) {
-            $errors['gender'] = 'يرجى تحديد الجنس';
+        if ($form_data['user_type'] != 'hospital') {
+            if (empty($form_data['gender']) || !in_array($form_data['gender'], ['male', 'female'])) {
+                $errors['gender'] = 'يرجى تحديد الجنس';
+            }
         }
 
         if (!isset($_POST['terms'])) $errors['terms'] = 'يجب الموافقة على الشروط';
@@ -143,6 +145,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ]);
 
                 if ($stmt->rowCount()) {
+                    // If user is a hospital, add to hospitals table
+                    if ($form_data['user_type'] == 'hospital') {
+                        try {
+                            $stmt_hospital = $conn->prepare("INSERT INTO hospitals (name, email, phone, type, description) VALUES (?, ?, ?, 'خاص', 'تم التسجيل عبر الموقع')");
+                            $stmt_hospital->execute([$form_data['full_name'], $form_data['email'], $form_data['phone']]);
+                        } catch (PDOException $e) {
+                            // Log error but don't stop registration success (user is created)
+                            error_log("Error creating hospital record: " . $e->getMessage());
+                        }
+                    }
                     $success = 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.';
                     foreach ($form_data as $key => $value) {
                         $form_data[$key] = '';
@@ -284,6 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <option value="" disabled <?php echo empty($form_data['user_type']) ? 'selected' : ''; ?>>-- اختر --</option>
                                 <option value="patient" <?php echo ($form_data['user_type'] == 'patient') ? 'selected' : ''; ?>>مريض</option>
                                 <option value="doctor" <?php echo ($form_data['user_type'] == 'doctor') ? 'selected' : ''; ?>>طبيب</option>
+                                <option value="hospital" <?php echo ($form_data['user_type'] == 'hospital') ? 'selected' : ''; ?>>مستشفى</option>
                             </select>
                             <?php if (isset($errors['user_type'])): ?><span class="error-message"><?php echo $errors['user_type']; ?></span><?php endif; ?>
                         </div>
@@ -344,6 +357,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 toggleVisibility(btn);
             }
         });
+
+        // Handle User Type Change
+        var userTypeSelect = document.getElementById('user_type');
+        var genderGroup = document.querySelector('.form-group:has(input[name="gender"])') || document.querySelector('input[name="gender"]').closest('.form-group');
+        var fullNameLabel = document.querySelector('label[for="full_name"]');
+
+        function updateUserTypeUI() {
+            if (userTypeSelect.value === 'hospital') {
+                if(genderGroup) genderGroup.style.display = 'none';
+                if(fullNameLabel) fullNameLabel.textContent = 'اسم المستشفى';
+                // Remove required attribute from gender inputs
+                document.querySelectorAll('input[name="gender"]').forEach(input => input.removeAttribute('required'));
+            } else {
+                if(genderGroup) genderGroup.style.display = 'block';
+                if(fullNameLabel) fullNameLabel.textContent = 'الاسم الكامل';
+                document.querySelectorAll('input[name="gender"]').forEach(input => input.setAttribute('required', 'required'));
+            }
+        }
+
+        userTypeSelect.addEventListener('change', updateUserTypeUI);
+        // Run on load
+        updateUserTypeUI();
     })();
 </script>
 </body>

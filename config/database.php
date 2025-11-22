@@ -18,7 +18,7 @@ class Database {
     public function __construct() {
         // استخدام متغيرات البيئة للمعلومات الحساسة
         $this->host = $_ENV['DB_HOST'] ?? 'localhost';
-        $this->db_name = $_ENV['DB_NAME'] ?? 'medical_booking';
+        $this->db_name = $_ENV['DB_NAME'] ?? 'medical_booking_test';
         $this->username = $_ENV['DB_USERNAME'] ?? 'root';
         $this->password = $_ENV['DB_PASSWORD'] ?? '';
     }

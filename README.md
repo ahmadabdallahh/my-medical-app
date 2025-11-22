@@ -76,6 +76,7 @@
 | Patient Account | `testt@email.com`      | `agagdasdg44DD@@#` |
 | Admin Account   | `admin@shifa.com`      | `admin123`       |
 | Doctor Account  | `dr.ahmed@medical.com` | `doctor123`      |
+| Hospital Account  | `hospital@email.com` | `123456`      |
 
 ### 🔐 الأمان
 

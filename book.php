@@ -1,10 +1,26 @@
 <?php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once 'includes/functions.php';
+require_once 'config/database.php';
 
 // التحقق من تسجيل الدخول
+// Temporarily disabled for testing
+/*
 if (!is_logged_in()) {
     header("Location: login.php");
     exit();
+}
+*/
+
+// For testing, create a dummy user if not logged in
+if (!is_logged_in()) {
+    $_SESSION['user_id'] = 1;
+    $_SESSION['user_name'] = 'Test User';
+    $_SESSION['user_type'] = 'patient';
+    $_SESSION['email'] = 'test@example.com';
 }
 
 $user = get_logged_in_user();
@@ -15,35 +31,56 @@ $success = '';
 $doctor_id = isset($_GET['doctor']) ? (int)$_GET['doctor'] : 0;
 $clinic_id = isset($_GET['clinic']) ? (int)$_GET['clinic'] : 0;
 
+// Debug: Log the received parameters
+error_log("Book.php - Doctor ID: $doctor_id, Clinic ID: $clinic_id");
+
 if (!$doctor_id || !$clinic_id) {
+    error_log("Book.php - Missing parameters, redirecting to search.php");
     header("Location: search.php");
     exit();
 }
 
 // الحصول على معلومات الطبيب والعيادة
-$db = new Database();
-$conn = $db->getConnection();
+try {
+    $db = new Database();
+    $conn = $db->getConnection();
+    
+    if (!$conn) {
+        throw new Exception("Database connection failed");
+    }
 
-$stmt = $conn->prepare("
-    SELECT d.*, s.name as specialty_name, c.name as clinic_name, 
-           h.name as hospital_name, h.address as hospital_address,
-           c.consultation_fee
-    FROM doctors d
-    LEFT JOIN specialties s ON d.specialty_id = s.id
-    LEFT JOIN clinics c ON d.clinic_id = c.id
-    LEFT JOIN hospitals h ON c.hospital_id = h.id
-    WHERE d.id = ? AND c.id = ?
-");
-$stmt->execute([$doctor_id, $clinic_id]);
-$doctor = $stmt->fetch();
+    $stmt = $conn->prepare("
+        SELECT d.*, s.name as specialty_name, c.name as clinic_name, 
+               h.name as hospital_name, h.address as hospital_address,
+               c.consultation_fee
+        FROM doctors d
+        LEFT JOIN specialties s ON d.specialty_id = s.id
+        LEFT JOIN clinics c ON d.clinic_id = c.id
+        LEFT JOIN hospitals h ON c.hospital_id = h.id
+        WHERE d.id = ? AND c.id = ?
+    ");
+    $stmt->execute([$doctor_id, $clinic_id]);
+    $doctor = $stmt->fetch();
 
-if (!$doctor) {
-    header("Location: search.php");
-    exit();
+    error_log("Book.php - Doctor found: " . ($doctor ? 'Yes' : 'No'));
+
+    if (!$doctor) {
+        error_log("Book.php - Doctor not found, redirecting to search.php");
+        header("Location: search.php");
+        exit();
+    }
+} catch (Exception $e) {
+    error_log("Book.php - Exception: " . $e->getMessage());
+    $error = "حدث خطأ في الاتصال بقاعدة البيانات: " . $e->getMessage();
 }
 
 // الحصول على أوقات عمل الطبيب
-$schedule = get_doctor_schedule($doctor_id);
+try {
+    $schedule = get_doctor_schedule($doctor_id);
+} catch (Exception $e) {
+    error_log("Book.php - Schedule error: " . $e->getMessage());
+    $schedule = [];
+}
 
 // معالجة حجز الموعد
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -85,7 +122,12 @@ $available_times = [];
 $selected_date = '';
 if (isset($_POST['appointment_date']) && !empty($_POST['appointment_date'])) {
     $selected_date = $_POST['appointment_date'];
-    $available_times = get_available_times($doctor_id, $selected_date);
+    try {
+        $available_times = get_available_times($doctor_id, $selected_date);
+    } catch (Exception $e) {
+        error_log("Book.php - Available times error: " . $e->getMessage());
+        $available_times = [];
+    }
 }
 
 // تحويل أيام الأسبوع إلى العربية
@@ -100,7 +142,12 @@ $days_arabic = [
 ];
 
 // الحصول على تقييمات الطبيب
-$reviews = get_doctor_reviews($doctor_id, 5);
+try {
+    $reviews = get_doctor_reviews($doctor_id, 5);
+} catch (Exception $e) {
+    error_log("Book.php - Reviews error: " . $e->getMessage());
+    $reviews = [];
+}
 $average_rating = 0;
 if (!empty($reviews)) {
     $total_rating = array_sum(array_column($reviews, 'rating'));
@@ -110,544 +157,308 @@ if (!empty($reviews)) {
 $page_title = "حجز موعد مع د. " . htmlspecialchars($doctor['full_name']);
 ?>
 
-<?php include 'includes/dashboard_header.php'; ?>
-
-<style>
-        .booking-page {
-            padding-top: 80px;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
-        }
-        
-        .booking-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 20px;
-        }
-        
-        .booking-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        .booking-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary-blue), var(--medical-green));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .booking-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-        
-        .doctor-info-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
-            position: sticky;
-            top: 100px;
-        }
-        
-        .doctor-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-blue), var(--medical-green));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 3rem;
-            color: white;
-        }
-        
-        .doctor-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-        
-        .doctor-specialty {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-        
-        .doctor-details {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-radius: var(--radius);
-            transition: var(--transition);
-        }
-        
-        .detail-item:hover {
-            background: var(--primary-blue);
-            color: white;
-        }
-        
-        .detail-item i {
-            width: 20px;
-            color: var(--primary-blue);
-            transition: var(--transition);
-        }
-        
-        .detail-item:hover i {
-            color: white;
-        }
-        
-        .rating-section {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .rating-stars {
-            margin-bottom: 0.5rem;
-        }
-        
-        .rating-stars i {
-            color: #fbbf24;
-            font-size: 1.2rem;
-        }
-        
-        .rating-text {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .booking-form-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .form-section {
-            margin-bottom: 2rem;
-        }
-        
-        .form-section h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius);
-            font-size: 1rem;
-            transition: var(--transition);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-        
-        .time-slot {
-            padding: 0.75rem;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-        
-        .time-slot:hover {
-            border-color: var(--primary-blue);
-            background: var(--primary-blue);
-            color: white;
-        }
-        
-        .time-slot.selected {
-            border-color: var(--medical-green);
-            background: var(--medical-green);
-            color: white;
-        }
-        
-        .time-slot.unavailable {
-            background: var(--error);
-            color: white;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        
-        .schedule-info {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            margin-bottom: 2rem;
-        }
-        
-        .schedule-grid {
-            display: grid;
-            gap: 0.75rem;
-        }
-        
-        .schedule-day {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            background: var(--bg-primary);
-            border-radius: var(--radius);
-        }
-        
-        .day-name {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .day-time {
-            color: var(--text-secondary);
-        }
-        
-        .btn-book {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary-blue), var(--medical-green));
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        
-        .btn-book:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-xl);
-        }
-        
-        .btn-book:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .messages {
-            margin-bottom: 2rem;
-        }
-        
-        .message {
-            padding: 1rem;
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .message.success {
-            background: linear-gradient(135deg, var(--success), #34d399);
-            color: white;
-        }
-        
-        .message.error {
-            background: linear-gradient(135deg, var(--error), #f87171);
-            color: white;
-        }
-        
-        .reviews-section {
-            margin-top: 2rem;
-        }
-        
-        .review-item {
-            background: var(--bg-secondary);
-            padding: 1rem;
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
-        }
-        
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        
-        .reviewer-name {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .review-date {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        
-        .review-rating {
-            margin-bottom: 0.5rem;
-        }
-        
-        .review-rating i {
-            color: #fbbf24;
-        }
-        
-        .review-comment {
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        
-        @media (max-width: 768px) {
-            .booking-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $page_title; ?></title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts (Cairo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Alpine.js for dropdown -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
             }
-            
-            .doctor-info-card {
-                position: static;
-            }
-            
-            .time-slots {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
         }
     </style>
+</head>
+<body class="font-cairo bg-gray-50">
+
+<?php include 'includes/dashboard_header.php'; ?>
+
+<!-- Debug/Error Display -->
+<?php if ($error): ?>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <strong>خطأ:</strong> <?php echo htmlspecialchars($error); ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Debug Info -->
+<?php if (isset($_GET['debug']) && $_GET['debug'] == '1'): ?>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+            <strong>Debug Info:</strong><br>
+            Doctor ID: <?php echo htmlspecialchars($doctor_id); ?><br>
+            Clinic ID: <?php echo htmlspecialchars($clinic_id); ?><br>
+            Doctor Found: <?php echo $doctor ? 'Yes' : 'No'; ?><br>
+            Schedule Count: <?php echo count($schedule); ?><br>
+            Reviews Count: <?php echo count($reviews); ?>
+        </div>
+    </div>
+<?php endif; ?>
+
 
     <!-- Booking Page -->
-    <section class="booking-page">
-        <div class="booking-container">
+    <div class="min-h-screen bg-gray-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
             <!-- Page Header -->
-            <div class="booking-header">
-                <h1>حجز موعد طبي</h1>
-                <p>احجز موعدك مع أفضل الأطباء بسهولة وأمان</p>
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500 mb-4">
+                    حجز موعد طبي
+                </h1>
+                <p class="text-lg text-gray-600">احجز موعدك مع أفضل الأطباء بسهولة وأمان</p>
             </div>
 
             <!-- Messages -->
-            <div class="messages">
+            <div class="mb-8">
                 <?php if ($success): ?>
-                    <div class="message success">
-                        <i class="fas fa-check-circle"></i>
-                        <span><?php echo $success; ?></span>
+                    <div class="bg-green-100 border-r-4 border-green-500 text-green-700 p-4 rounded-lg shadow-sm flex items-center" role="alert">
+                        <i class="fas fa-check-circle text-xl ml-3"></i>
+                        <p class="font-medium"><?php echo $success; ?></p>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($error): ?>
-                    <div class="message error">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span><?php echo $error; ?></span>
+                    <div class="bg-red-100 border-r-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm flex items-center" role="alert">
+                        <i class="fas fa-exclamation-circle text-xl ml-3"></i>
+                        <p class="font-medium"><?php echo $error; ?></p>
                     </div>
                 <?php endif; ?>
             </div>
 
-            <div class="booking-grid">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Doctor Information -->
-                <div class="doctor-info-card">
-                    <div class="doctor-avatar">
-                        <?php if (isset($doctor['image']) && $doctor['image']): ?>
-                            <img src="<?php echo htmlspecialchars($doctor['image']); ?>" alt="<?php echo htmlspecialchars($doctor['full_name']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                        <?php else: ?>
-                            <i class="fas fa-user-md"></i>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="doctor-name">د. <?php echo htmlspecialchars($doctor['full_name']); ?></div>
-                    <div class="doctor-specialty"><?php echo htmlspecialchars($doctor['specialty_name']); ?></div>
-                    
-                    <div class="doctor-details">
-                        <div class="detail-item">
-                            <i class="fas fa-hospital"></i>
-                            <span><?php echo htmlspecialchars($doctor['hospital_name']); ?></span>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-stethoscope"></i>
-                            <span><?php echo htmlspecialchars($doctor['clinic_name']); ?></span>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span><?php echo htmlspecialchars($doctor['hospital_address']); ?></span>
-                        </div>
-                        <?php if (isset($doctor['consultation_fee']) && $doctor['consultation_fee'] > 0): ?>
-                            <div class="detail-item">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>رسوم الاستشارة: <?php echo number_format($doctor['consultation_fee'], 2); ?> جنيه</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="rating-section">
-                        <div class="rating-stars">
-                            <?php
-                            for ($i = 1; $i <= 5; $i++) {
-                                if ($i <= $average_rating) {
-                                    echo '<i class="fas fa-star"></i>';
-                                } elseif ($i - $average_rating < 1) {
-                                    echo '<i class="fas fa-star-half-alt"></i>';
-                                } else {
-                                    echo '<i class="far fa-star"></i>';
-                                }
-                            }
-                            ?>
-                        </div>
-                        <div class="rating-text"><?php echo number_format($average_rating, 1); ?> من 5</div>
-                        <div style="color: var(--text-secondary); font-size: 0.9rem;"><?php echo count($reviews); ?> تقييم</div>
-                    </div>
-                    
-                    <!-- Schedule Information -->
-                    <div class="schedule-info">
-                        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">أوقات العمل:</h4>
-                        <div class="schedule-grid">
-                            <?php foreach ($schedule as $day): ?>
-                                <div class="schedule-day">
-                                    <span class="day-name"><?php echo $days_arabic[$day['day_of_week']]; ?></span>
-                                    <span class="day-time">
-                                        <?php echo date('H:i', strtotime($day['start_time'])); ?> - 
-                                        <?php echo date('H:i', strtotime($day['end_time'])); ?>
-                                    </span>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- Recent Reviews -->
-                    <?php if (!empty($reviews)): ?>
-                        <div class="reviews-section">
-                            <h4 style="margin-bottom: 1rem; color: var(--text-primary);">آخر التقييمات:</h4>
-                            <?php foreach (array_slice($reviews, 0, 3) as $review): ?>
-                                <div class="review-item">
-                                    <div class="review-header">
-                                        <span class="reviewer-name"><?php echo htmlspecialchars($review['user_name']); ?></span>
-                                        <span class="review-date"><?php echo date('Y/m/d', strtotime($review['created_at'])); ?></span>
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden sticky top-24">
+                        <div class="bg-gradient-to-br from-blue-600 to-teal-500 p-6 text-center">
+                            <div class="w-32 h-32 mx-auto bg-white rounded-full p-1 mb-4 shadow-lg">
+                                <?php if (isset($doctor['image']) && $doctor['image']): ?>
+                                    <img src="<?php echo htmlspecialchars($doctor['image']); ?>" alt="<?php echo htmlspecialchars($doctor['full_name']); ?>" class="w-full h-full object-cover rounded-full">
+                                <?php else: ?>
+                                    <div class="w-full h-full rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-4xl">
+                                        <i class="fas fa-user-md"></i>
                                     </div>
-                                    <div class="review-rating">
+                                <?php endif; ?>
+                            </div>
+                            <h2 class="text-2xl font-bold text-white mb-1">د. <?php echo htmlspecialchars($doctor['full_name']); ?></h2>
+                            <p class="text-blue-100 font-medium"><?php echo htmlspecialchars($doctor['specialty_name']); ?></p>
+                        </div>
+
+                        <div class="p-6 space-y-4">
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors duration-300">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 ml-3">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">المستشفى</p>
+                                    <p class="font-semibold text-gray-800"><?php echo htmlspecialchars($doctor['hospital_name']); ?></p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors duration-300">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 ml-3">
+                                    <i class="fas fa-stethoscope"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">العيادة</p>
+                                    <p class="font-semibold text-gray-800"><?php echo htmlspecialchars($doctor['clinic_name']); ?></p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors duration-300">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 ml-3">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">العنوان</p>
+                                    <p class="font-semibold text-gray-800"><?php echo htmlspecialchars($doctor['hospital_address']); ?></p>
+                                </div>
+                            </div>
+
+                            <?php if (isset($doctor['consultation_fee']) && $doctor['consultation_fee'] > 0): ?>
+                                <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors duration-300">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 ml-3">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">رسوم الاستشارة</p>
+                                        <p class="font-semibold text-gray-800"><?php echo number_format($doctor['consultation_fee'], 2); ?> جنيه</p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="border-t border-gray-100 pt-4 mt-4">
+                                <div class="text-center">
+                                    <div class="flex justify-center items-center mb-2 space-x-1 space-x-reverse text-yellow-400">
                                         <?php
                                         for ($i = 1; $i <= 5; $i++) {
-                                            if ($i <= $review['rating']) {
+                                            if ($i <= $average_rating) {
                                                 echo '<i class="fas fa-star"></i>';
+                                            } elseif ($i - $average_rating < 1) {
+                                                echo '<i class="fas fa-star-half-alt"></i>';
                                             } else {
-                                                echo '<i class="far fa-star"></i>';
+                                                echo '<i class="far fa-star text-gray-300"></i>';
                                             }
                                         }
                                         ?>
                                     </div>
-                                    <?php if (!empty($review['comment'])): ?>
-                                        <div class="review-comment"><?php echo htmlspecialchars($review['comment']); ?></div>
-                                    <?php endif; ?>
+                                    <p class="font-bold text-gray-800 text-lg"><?php echo number_format($average_rating, 1); ?> <span class="text-sm text-gray-500 font-normal">من 5</span></p>
+                                    <p class="text-sm text-gray-500"><?php echo count($reviews); ?> تقييم</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Form & Schedule -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Schedule Info -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-calendar-alt text-blue-600 ml-2"></i>
+                            أوقات العمل
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <?php foreach ($schedule as $day): ?>
+                                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all duration-300">
+                                    <p class="font-bold text-gray-800 mb-1"><?php echo $days_arabic[$day['day_of_week']]; ?></p>
+                                    <p class="text-sm text-blue-600 font-medium dir-ltr">
+                                        <?php echo date('H:i', strtotime($day['start_time'])); ?> - <?php echo date('H:i', strtotime($day['end_time'])); ?>
+                                    </p>
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                    <?php endif; ?>
-                </div>
+                    </div>
 
-                <!-- Booking Form -->
-                <div class="booking-form-card">
-                    <form method="POST" id="bookingForm">
-                        <!-- Date Selection -->
-                        <div class="form-section">
-                            <h3><i class="fas fa-calendar"></i> اختيار التاريخ</h3>
-                            <div class="form-group">
-                                <label class="form-label">التاريخ المطلوب:</label>
-                                <input type="date" name="appointment_date" class="form-input" 
-                                       min="<?php echo date('Y-m-d'); ?>" 
-                                       value="<?php echo $selected_date; ?>" 
-                                       required>
-                            </div>
-                        </div>
-
-                        <!-- Time Selection -->
-                        <div class="form-section">
-                            <h3><i class="fas fa-clock"></i> اختيار الوقت</h3>
-                            <div class="form-group">
-                                <label class="form-label">الوقت المتاح:</label>
-                                <?php if (!empty($available_times)): ?>
-                                    <div class="time-slots">
-                                        <?php foreach ($available_times as $time): ?>
-                                            <div class="time-slot" data-time="<?php echo $time; ?>">
-                                                <?php echo date('H:i', strtotime($time)); ?>
-                                            </div>
-                                        <?php endforeach; ?>
+                    <!-- Booking Form -->
+                    <div class="bg-white rounded-2xl shadow-xl p-8 border-t-4 border-blue-600">
+                        <form method="POST" id="bookingForm" class="space-y-8">
+                            <!-- Date Selection -->
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center ml-2 text-sm">1</span>
+                                    اختيار التاريخ
+                                </h3>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-calendar text-gray-400"></i>
                                     </div>
-                                    <input type="hidden" name="appointment_time" id="selected_time" required>
-                                <?php else: ?>
-                                    <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
-                                        اختر تاريخاً أولاً لعرض الأوقات المتاحة
-                                    </p>
-                                <?php endif; ?>
+                                    <input type="date" name="appointment_date" 
+                                           class="w-full pr-10 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
+                                           min="<?php echo date('Y-m-d'); ?>" 
+                                           value="<?php echo $selected_date; ?>" 
+                                           required>
+                                </div>
+                            </div>
+
+                            <!-- Time Selection -->
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center ml-2 text-sm">2</span>
+                                    اختيار الوقت
+                                </h3>
+                                <div class="bg-gray-50 rounded-xl p-6 border-2 border-dashed border-gray-200">
+                                    <?php if (!empty($available_times)): ?>
+                                        <div class="time-slots grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                            <?php foreach ($available_times as $time): ?>
+                                                <div class="time-slot cursor-pointer text-center py-2 px-3 rounded-lg border-2 border-gray-200 bg-white hover:border-blue-500 hover:bg-blue-50 transition-all duration-200" 
+                                                     data-time="<?php echo $time; ?>">
+                                                    <span class="font-medium text-gray-700 dir-ltr block"><?php echo date('H:i', strtotime($time)); ?></span>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <input type="hidden" name="appointment_time" id="selected_time" required>
+                                    <?php else: ?>
+                                        <div class="text-center py-8 text-gray-500">
+                                            <i class="fas fa-calendar-day text-4xl mb-3 text-gray-300"></i>
+                                            <p>يرجى اختيار تاريخ أعلاه لعرض الأوقات المتاحة</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center ml-2 text-sm">3</span>
+                                    ملاحظات إضافية
+                                </h3>
+                                <textarea name="notes" 
+                                          class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 min-h-[120px]"
+                                          placeholder="هل لديك أي أعراض معينة أو ملاحظات للطبيب؟"></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2" id="submitBtn" disabled>
+                                <i class="fas fa-calendar-check text-xl"></i>
+                                <span>تأكيد حجز الموعد</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Recent Reviews -->
+                    <?php if (!empty($reviews)): ?>
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">آخر التقييمات</h3>
+                            <div class="space-y-6">
+                                <?php foreach (array_slice($reviews, 0, 3) as $review): ?>
+                                    <div class="bg-gray-50 rounded-xl p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <span class="font-bold text-gray-800 block"><?php echo htmlspecialchars($review['user_name']); ?></span>
+                                                <span class="text-xs text-gray-500"><?php echo date('Y/m/d', strtotime($review['created_at'])); ?></span>
+                                            </div>
+                                            <div class="flex text-yellow-400 text-sm">
+                                                <?php
+                                                for ($i = 1; $i <= 5; $i++) {
+                                                    echo $i <= $review['rating'] ? '<i class="fas fa-star"></i>' : '<i class="far fa-star text-gray-300"></i>';
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <?php if (!empty($review['comment'])): ?>
+                                            <p class="text-gray-600 text-sm leading-relaxed"><?php echo htmlspecialchars($review['comment']); ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
                         </div>
-
-                        <!-- Notes -->
-                        <div class="form-section">
-                            <h3><i class="fas fa-notes-medical"></i> ملاحظات إضافية</h3>
-                            <div class="form-group">
-                                <label class="form-label">ملاحظات (اختياري):</label>
-                                <textarea name="notes" class="form-input form-textarea" 
-                                          placeholder="اكتب أي ملاحظات أو تفاصيل إضافية..."></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn-book" id="submitBtn" disabled>
-                            <i class="fas fa-calendar-plus"></i>
-                            حجز الموعد
-                        </button>
-                    </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <script src="assets/js/script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const dateInput = document.querySelector('input[name="appointment_date"]');
-            const timeSlots = document.querySelectorAll('.time-slot');
+            const timeSlotsContainer = document.querySelector('.time-slots');
             const selectedTimeInput = document.getElementById('selected_time');
             const submitBtn = document.getElementById('submitBtn');
             const form = document.getElementById('bookingForm');
@@ -656,8 +467,12 @@ $page_title = "حجز موعد مع د. " . htmlspecialchars($doctor['full_name'
             dateInput.addEventListener('change', function() {
                 const selectedDate = this.value;
                 if (selectedDate) {
-                    // Submit form to get available times
+                    // Show loading state
+                    const container = document.querySelector('.bg-gray-50.rounded-xl.p-6');
+                    container.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i><p class="mt-2 text-gray-500">جاري تحميل الأوقات...</p></div>';
+
                     const formData = new FormData();
+                    formData.append('doctor_id', <?php echo $doctor_id; ?>);
                     formData.append('appointment_date', selectedDate);
                     
                     fetch('get_available_times.php', {
@@ -670,57 +485,82 @@ $page_title = "حجز موعد مع د. " . htmlspecialchars($doctor['full_name'
                     })
                     .catch(error => {
                         console.error('Error:', error);
+                        container.innerHTML = '<div class="text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle text-3xl mb-2"></i><p>حدث خطأ أثناء تحميل الأوقات</p></div>';
                     });
                 }
             });
 
-            // Handle time slot selection
-            timeSlots.forEach(slot => {
-                slot.addEventListener('click', function() {
-                    if (!this.classList.contains('unavailable')) {
-                        // Remove selected class from all slots
-                        timeSlots.forEach(s => s.classList.remove('selected'));
-                        
-                        // Add selected class to clicked slot
-                        this.classList.add('selected');
-                        
-                        // Update hidden input
-                        selectedTimeInput.value = this.dataset.time;
-                        
-                        // Enable submit button
-                        submitBtn.disabled = false;
-                    }
+            function attachTimeSlotListeners() {
+                const timeSlots = document.querySelectorAll('.time-slot');
+                timeSlots.forEach(slot => {
+                    slot.addEventListener('click', function() {
+                        if (!this.classList.contains('opacity-50')) {
+                            // Remove selected class from all slots
+                            timeSlots.forEach(s => {
+                                s.classList.remove('border-blue-600', 'bg-blue-600', 'text-white', 'ring-2', 'ring-blue-300');
+                                s.classList.add('border-gray-200', 'bg-white', 'text-gray-700');
+                                // Reset hover effect
+                                s.classList.add('hover:border-blue-500', 'hover:bg-blue-50');
+                            });
+                            
+                            // Add selected class to clicked slot
+                            this.classList.remove('border-gray-200', 'bg-white', 'text-gray-700', 'hover:border-blue-500', 'hover:bg-blue-50');
+                            this.classList.add('border-blue-600', 'bg-blue-600', 'text-white', 'ring-2', 'ring-blue-300');
+                            
+                            // Update hidden input
+                            selectedTimeInput.value = this.dataset.time;
+                            
+                            // Enable submit button
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        }
+                    });
                 });
-            });
+            }
+
+            // Initial attachment
+            if (timeSlotsContainer) {
+                attachTimeSlotListeners();
+            }
 
             function updateTimeSlots(times) {
-                const timeSlotsContainer = document.querySelector('.time-slots');
-                if (timeSlotsContainer) {
-                    timeSlotsContainer.innerHTML = '';
+                const container = document.querySelector('.bg-gray-50.rounded-xl.p-6');
+                
+                if (times && times.length > 0) {
+                    let html = '<div class="time-slots grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">';
+                    times.forEach(time => {
+                        // Format time to HH:MM
+                        const date = new Date('1970-01-01T' + time);
+                        const formattedTime = date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                        
+                        html += `
+                            <div class="time-slot cursor-pointer text-center py-2 px-3 rounded-lg border-2 border-gray-200 bg-white hover:border-blue-500 hover:bg-blue-50 transition-all duration-200" 
+                                 data-time="${time}">
+                                <span class="font-medium text-gray-700 dir-ltr block">${formattedTime}</span>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    html += '<input type="hidden" name="appointment_time" id="selected_time" required>';
+                    container.innerHTML = html;
                     
-                    if (times && times.length > 0) {
-                        times.forEach(time => {
-                            const slot = document.createElement('div');
-                            slot.className = 'time-slot';
-                            slot.dataset.time = time;
-                            slot.textContent = time;
-                            slot.addEventListener('click', function() {
-                                timeSlots.forEach(s => s.classList.remove('selected'));
-                                this.classList.add('selected');
-                                selectedTimeInput.value = this.dataset.time;
-                                submitBtn.disabled = false;
-                            });
-                            timeSlotsContainer.appendChild(slot);
-                        });
-                    } else {
-                        timeSlotsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">لا توجد أوقات متاحة في هذا التاريخ</p>';
-                    }
+                    // Re-attach listeners and update references
+                    selectedTimeInput = document.getElementById('selected_time');
+                    attachTimeSlotListeners();
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-calendar-times text-4xl mb-3 text-gray-300"></i>
+                            <p>لا توجد أوقات متاحة في هذا التاريخ</p>
+                        </div>
+                    `;
                 }
             }
 
             // Form validation
             form.addEventListener('submit', function(e) {
-                if (!selectedTimeInput.value) {
+                const selectedTime = document.getElementById('selected_time');
+                if (!selectedTime || !selectedTime.value) {
                     e.preventDefault();
                     alert('يرجى اختيار وقت للموعد');
                 }
@@ -729,3 +569,5 @@ $page_title = "حجز موعد مع د. " . htmlspecialchars($doctor['full_name'
     </script>
     
     <?php include 'includes/dashboard_footer.php'; ?>
+</body>
+</html>

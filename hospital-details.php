@@ -322,7 +322,7 @@ try {
 
                                 <!-- Actions -->
                                 <div class="flex space-x-3 space-x-reverse">
-                                    <a href="book.php?clinic=<?php echo $clinic['id']; ?>"
+                                    <a href="doctors.php?clinic=<?php echo $clinic['id']; ?>"
                                        class="flex-1 text-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
                                         <i class="fas fa-calendar-plus ml-1"></i>
                                         حجز موعد
@@ -405,7 +405,7 @@ try {
 
                                 <!-- Actions -->
                                 <div class="flex space-x-3 space-x-reverse">
-                                    <a href="book.php?doctor=<?php echo $doctor['id']; ?>"
+                                    <a href="book_appointment.php?doctor_id=<?php echo $doctor['id']; ?>"
                                        class="flex-1 text-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
                                         <i class="fas fa-calendar-plus ml-1"></i>
                                         حجز موعد

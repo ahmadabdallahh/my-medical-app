@@ -116,7 +116,6 @@ $specialties = get_all_specialties($conn);
     <!-- Main Content -->
     <main>
         <!-- Hero Section -->
-        <!-- Hero Section -->
         <section class="relative h-screen min-h-[600px] flex items-center justify-center text-center overflow-hidden">
             <!-- Background Image with Overlay -->
             <div class="absolute inset-0 z-0">
@@ -394,7 +393,7 @@ $specialties = get_all_specialties($conn);
                     foreach (array_slice($specialties, 0, 8) as $specialty):
                         $icon = $get_icon($specialty['name']);
                         $count = $specialty['doctor_count'] ?? 0;
-                    ?>
+                        ?>
                         <a href="search.php?specialty=<?php echo $specialty['id']; ?>"
                             class="group block bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 hover:-translate-y-1">
                             <div
@@ -403,7 +402,8 @@ $specialties = get_all_specialties($conn);
                                     class="<?php echo $icon; ?> text-2xl text-blue-600 group-hover:text-white transition-colors duration-300"></i>
                             </div>
                             <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
-                                <?php echo htmlspecialchars($specialty['name']); ?></h3>
+                                <?php echo htmlspecialchars($specialty['name']); ?>
+                            </h3>
                             <p class="text-sm text-gray-500">
                                 <?php echo $count; ?> دكتور متاح
                             </p>
@@ -469,24 +469,72 @@ $specialties = get_all_specialties($conn);
             </div>
         </section>
 
-        <!-- Call to Action Section
-        <section id="cta" class="bg-blue-600">
-            <div class="container mx-auto px-4 py-20 text-center">
-                <h2 class="text-4xl md:text-5xl font-black text-white">جاهز لبدء رحلتك نحو صحة أفضل؟</h2>
-                <p class="text-lg text-blue-100 mt-4 max-w-2xl mx-auto">انضم إلى آلاف المستخدمين الذين يثقون في Health
-                    Tech للعثور على الرعاية الصحية التي يستحقونها، أو ساهم بخبرتك وانضم إلينا كطبيب.</p>
-                <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-                    <a href="search.php"
-                        class="w-full sm:w-auto bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-lg hover:bg-blue-50 transition-transform transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-search ml-2"></i> ابحث عن طبيب الآن
-                    </a>
-                    <a href="register.php?type=doctor"
-                        class="w-full sm:w-auto bg-green-500 text-white font-bold text-lg px-8 py-4 rounded-lg hover:bg-green-600 transition-transform transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-user-md ml-2"></i> انضم إلينا كطبيب
-                    </a>
+        <!-- Contact Us Section -->
+        <section id="contact" class="py-20 bg-gray-50 relative overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-teal-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+
+            <div class="container mx-auto px-4 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-black text-gray-900 mb-4">تواصل <span class="text-blue-600">معنا</span></h2>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">نحن هنا للإجابة على استفساراتك ومساعدتك في الحصول على أفضل رعاية صحية.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Phone Contact -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 group text-center border border-gray-100">
+                        <div class="w-20 h-20 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300 relative">
+                            <div class="absolute inset-0 bg-blue-200 rounded-full animate-ping opacity-20 group-hover:opacity-40"></div>
+                            <i class="fas fa-phone-alt text-3xl text-blue-600 group-hover:text-white transition-colors duration-300 animate-bounce-slow"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">اتصل بنا</h3>
+                        <p class="text-gray-600 mb-4">متاحين على مدار الساعة</p>
+                        <a href="tel:+20123456789" class="text-blue-600 font-bold text-lg hover:text-blue-700 dir-ltr block">+20 123 456 789</a>
+                    </div>
+
+                    <!-- Email Contact -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 group text-center border border-gray-100">
+                        <div class="w-20 h-20 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors duration-300 relative">
+                            <div class="absolute inset-0 bg-green-200 rounded-full animate-ping opacity-20 group-hover:opacity-40"></div>
+                            <i class="fas fa-envelope text-3xl text-green-600 group-hover:text-white transition-colors duration-300 animate-pulse"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">راسلنا عبر البريد</h3>
+                        <p class="text-gray-600 mb-4">نرد في غضون 24 ساعة</p>
+                        <a href="mailto:support@healthtech.com" class="text-green-600 font-bold text-lg hover:text-green-700">support@healthtech.com</a>
+                    </div>
+
+                    <!-- Location Contact -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 group text-center border border-gray-100">
+                        <div class="w-20 h-20 mx-auto bg-orange-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors duration-300 relative">
+                            <div class="absolute inset-0 bg-orange-200 rounded-full animate-ping opacity-20 group-hover:opacity-40"></div>
+                            <i class="fas fa-map-marker-alt text-3xl text-orange-600 group-hover:text-white transition-colors duration-300 animate-bounce"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">زرنا في مقرنا</h3>
+                        <p class="text-gray-600 mb-4">القاهرة، مصر</p>
+                        <span class="text-orange-600 font-bold text-lg">شارع التسعين، التجمع الخامس</span>
+                    </div>
                 </div>
             </div>
-        </section> -->
+            
+            <style>
+                @keyframes blob {
+                    0% { transform: translate(0px, 0px) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0px, 0px) scale(1); }
+                }
+                .animate-blob {
+                    animation: blob 7s infinite;
+                }
+                .animation-delay-2000 {
+                    animation-delay: 2s;
+                }
+                .animate-bounce-slow {
+                    animation: bounce 2s infinite;
+                }
+            </style>
+        </section>
 
     </main>
 
