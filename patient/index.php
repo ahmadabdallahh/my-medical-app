@@ -107,6 +107,12 @@ foreach ($upcoming_appointments as $appointment) {
                         </a>
                     </li>
                     <li>
+                        <a href="reminders.php" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-50 text-gray-700">
+                            <i class="fas fa-bell w-5"></i>
+                            <span>التذكيرات</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="../search.php" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-50 text-gray-700">
                             <i class="fas fa-search w-5"></i>
                             <span>البحث عن طبيب</span>

@@ -186,36 +186,24 @@ $doctors_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <form method="POST" class="inline-flex gap-2">
                                     <input type="hidden" name="appointment_id" value="<?php echo $appointment['id']; ?>">
+                                    <input type="hidden" name="update_status" value="1">
+                                    
                                     <?php if ($status == 'pending'): ?>
-                                        <button type="submit" name="update_status" value="confirmed" class="text-green-600 hover:text-green-900" title="تأكيد">
+                                        <button type="submit" name="status" value="confirmed" class="text-green-600 hover:text-green-900" title="تأكيد" onclick="return confirm('هل أنت متأكد من تأكيد هذا الموعد؟')">
                                             <i class="fas fa-check"></i>
                                         </button>
-                                        <button type="submit" name="update_status" value="cancelled" class="text-red-600 hover:text-red-900" title="إلغاء">
+                                        <button type="submit" name="status" value="cancelled" class="text-red-600 hover:text-red-900" title="إلغاء" onclick="return confirm('هل أنت متأكد من إلغاء هذا الموعد؟')">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     <?php elseif ($status == 'confirmed'): ?>
-                                        <button type="submit" name="update_status" value="completed" class="text-blue-600 hover:text-blue-900" title="إكمال">
+                                        <button type="submit" name="status" value="completed" class="text-blue-600 hover:text-blue-900" title="إكمال" onclick="return confirm('هل أنت متأكد من إكمال هذا الموعد؟')">
                                             <i class="fas fa-check-double"></i>
                                         </button>
-                                        <button type="submit" name="update_status" value="cancelled" class="text-red-600 hover:text-red-900" title="إلغاء">
+                                        <button type="submit" name="status" value="cancelled" class="text-red-600 hover:text-red-900" title="إلغاء" onclick="return confirm('هل أنت متأكد من إلغاء هذا الموعد؟')">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     <?php endif; ?>
-                                    <!-- Hidden input to pass status value when button clicked -->
-                                    <input type="hidden" name="status" id="status_<?php echo $appointment['id']; ?>">
                                 </form>
-                                <script>
-                                    // Simple script to set status before submit
-                                    document.querySelectorAll('button[name="update_status"]').forEach(btn => {
-                                        btn.addEventListener('click', function(e) {
-                                            e.preventDefault();
-                                            const form = this.closest('form');
-                                            const statusInput = form.querySelector('input[name="status"]');
-                                            statusInput.value = this.value;
-                                            form.submit();
-                                        });
-                                    });
-                                </script>
                             </td>
                         </tr>
                     <?php endforeach; ?>

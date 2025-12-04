@@ -196,7 +196,7 @@ $days_arabic = [
             </div>
 
             <div class="flex gap-4">
-                <a href="book.php?doctor=<?php echo $doctor['id']; ?>&clinic=<?php echo $doctor['clinic_id']; ?>" class="flex-1 bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition text-center">
+                <a href="book_appointment.php?doctor_id=<?php echo $doctor['id']; ?>" class="flex-1 bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition text-center">
                     <i class="fas fa-calendar-plus ml-2"></i>
                     حجز موعد
                 </a>
@@ -310,7 +310,7 @@ $days_arabic = [
             </div>
 
             <div class="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
-                <a href="book.php?doctor=<?php echo $doctor['id']; ?>&clinic=<?php echo $doctor['clinic_id']; ?>" class="flex-1 bg-green-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-green-700 transition text-center text-lg">
+                <a href="book_appointment.php?doctor_id=<?php echo $doctor['id']; ?>" class="flex-1 bg-green-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-green-700 transition text-center text-lg">
                     <i class="fas fa-calendar-plus ml-2"></i>
                     حجز موعد جديد
                 </a>

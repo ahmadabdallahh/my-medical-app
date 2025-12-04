@@ -29,15 +29,15 @@ if (!$doctor) {
 }
 
 // Get doctor's user_id (used in doctor_ratings table)
-$doctor_user_id = $doctor['user_id'] ?? $doctor_id;
+$doctor_user_id = $doctor['user_id'];
 
-// Get rating statistics (use user_id, not doctor id)
+// Get rating statistics
 $rating_stats = get_doctor_rating_stats($conn, $doctor_user_id);
 
-// Get recent ratings (use user_id, not doctor id)
+// Get recent ratings
 $recent_ratings = get_doctor_ratings($conn, $doctor_user_id, 5);
 
-// Check if current user can rate (use user_id, not doctor id)
+// Check if current user can rate
 $can_rate = ['can_rate' => false, 'reason' => ''];
 $user_rating = null;
 if (is_logged_in()) {
@@ -54,11 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_rating'])) {
     if (!is_logged_in()) {
         $error_message = 'يجب تسجيل الدخول لإضافة تقييم';
     } else {
-        // Make sure doctor_user_id is available
-        if (!isset($doctor_user_id)) {
-            $doctor_user_id = $doctor['user_id'] ?? $doctor_id;
-        }
-
         $user_id = $_SESSION['user_id'];
         $rating = (int)$_POST['rating'];
         $review = sanitize_input($_POST['review']);

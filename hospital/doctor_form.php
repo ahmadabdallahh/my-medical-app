@@ -43,15 +43,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $clinic_id = $_POST['clinic_id'];
     $consultation_fee = $_POST['consultation_fee'];
     
+    // Handle Image Upload
+    $image_path = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+        $filename = $_FILES['image']['name'];
+        $filetype = pathinfo($filename, PATHINFO_EXTENSION);
+        if (in_array(strtolower($filetype), $allowed)) {
+            $new_filename = uniqid() . '.' . $filetype;
+            $upload_dir = '../assets/images/doctors/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
+                $image_path = 'assets/images/doctors/' . $new_filename;
+            }
+        }
+    }
+
     if ($is_edit) {
         // Update Doctor
-        $stmt = $conn->prepare("
-            UPDATE doctors SET 
+        $sql = "UPDATE doctors SET 
                 full_name = ?, email = ?, phone = ?, specialty_id = ?, 
-                clinic_id = ?, consultation_fee = ?
-            WHERE id = ?
-        ");
-        $stmt->execute([$full_name, $email, $phone, $specialty_id, $clinic_id, $consultation_fee, $doctor_id]);
+                clinic_id = ?, consultation_fee = ?";
+        $params = [$full_name, $email, $phone, $specialty_id, $clinic_id, $consultation_fee];
+        
+        if ($image_path) {
+            $sql .= ", image = ?";
+            $params[] = $image_path;
+        }
+        
+        $sql .= " WHERE id = ?";
+        $params[] = $doctor_id;
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($params);
         $success_msg = "تم تحديث بيانات الطبيب بنجاح";
         
         // Refresh doctor data
@@ -71,11 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $new_user_id = $conn->lastInsertId();
             
             // 2. Create Doctor
-            $stmt = $conn->prepare("
-                INSERT INTO doctors (user_id, full_name, email, phone, specialty_id, clinic_id, hospital_id, consultation_fee, is_active)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
-            ");
-            $stmt->execute([$new_user_id, $full_name, $email, $phone, $specialty_id, $clinic_id, $hospital_id, $consultation_fee]);
+            $sql = "INSERT INTO doctors (user_id, full_name, email, phone, specialty_id, clinic_id, hospital_id, consultation_fee, is_active, image)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$new_user_id, $full_name, $email, $phone, $specialty_id, $clinic_id, $hospital_id, $consultation_fee, $image_path]);
             
             $success_msg = "تم إضافة الطبيب بنجاح";
             $is_edit = true; // Switch to edit mode
@@ -84,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt = $conn->prepare("SELECT * FROM doctors WHERE id = ?");
             $stmt->execute([$doctor_id]);
             $doctor = $stmt->fetch(PDO::FETCH_ASSOC);
+            header("Location: doctors.php?msg=" . urlencode($success_msg));
+            exit();
+            
             
         } catch (PDOException $e) {
             $error_msg = "خطأ: " . $e->getMessage();
@@ -113,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php endif; ?>
 
     <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Full Name -->
                 <div class="relative">
@@ -222,6 +250,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                class="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
                                placeholder="0.00">
                     </div>
+                </div>
+
+                <!-- Profile Image -->
+                <div class="relative">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">صورة الطبيب</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-image text-gray-400"></i>
+                        </div>
+                        <input type="file" name="image" accept="image/*"
+                               class="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white">
+                    </div>
+                    <?php if (!empty($doctor['image'])): ?>
+                        <div class="mt-2">
+                            <img src="../<?php echo htmlspecialchars($doctor['image']); ?>" alt="Current Image" class="h-20 w-20 object-cover rounded-full border-2 border-gray-200">
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 

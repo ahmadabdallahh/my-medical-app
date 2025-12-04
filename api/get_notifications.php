@@ -1,0 +1,25 @@
+<?php
+session_start();
+require_once '../config/database.php';
+require_once '../includes/notification_functions.php';
+
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'error' => 'Not logged in']);
+    exit;
+}
+
+$db = new Database();
+$conn = $db->getConnection();
+$user_id = $_SESSION['user_id'];
+
+$notifications = get_user_notifications($conn, $user_id, 10, false);
+$unread_count = get_unread_count($conn, $user_id);
+
+echo json_encode([
+    'success' => true,
+    'notifications' => $notifications,
+    'unread_count' => $unread_count
+]);
+?>

@@ -40,6 +40,7 @@ $base_path = $is_subdir ? '../' : '';
                     <?php if ($_SESSION['user_type'] === 'patient'): ?>
                         <a href="<?php echo $base_path; ?>dashboard.php" class="text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium">لوحة التحكم</a>
                         <a href="<?php echo $base_path; ?>patient/appointments.php" class="text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium">مواعيدي</a>
+                        <a href="<?php echo $base_path; ?>patient/reminders.php" class="text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium">التذكيرات</a>
                     <?php elseif ($_SESSION['user_type'] === 'doctor'): ?>
                         <a href="<?php echo $base_path; ?>doctor/index.php" class="text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium">لوحة التحكم</a>
                     <?php elseif ($_SESSION['user_type'] === 'admin'): ?>
@@ -47,6 +48,29 @@ $base_path = $is_subdir ? '../' : '';
                     <?php elseif ($_SESSION['user_type'] === 'hospital'): ?>
                         <a href="<?php echo $base_path; ?>hospital/index.php" class="text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium">لوحة التحكم</a>
                     <?php endif; ?>
+                    
+                    <!-- Notification Bell -->
+                    <div class="relative" x-data="{ notifOpen: false }">
+                        <button @click="notifOpen = !notifOpen" id="notificationBell" class="relative text-gray-200 hover:text-white p-2 rounded-md transition">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="notificationBadge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div x-show="notifOpen" @click.away="notifOpen = false" id="notificationDropdown" class="absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 hidden" style="display: none;">
+                            <div class="p-3 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="text-gray-800 font-semibold">الإشعارات</h3>
+                                <button id="markAllAsRead" class="text-xs text-blue-600 hover:text-blue-800">تحديد الكل كمقروء</button>
+                            </div>
+                            <div id="notificationList" class="max-h-96 overflow-y-auto">
+                                <!-- Notifications will be loaded here -->
+                                <div class="p-4 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <a href="<?php echo $base_path; ?>logout.php" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition">تسجيل الخروج</a>
                 <?php else: ?>
                     <a href="<?php echo $base_path; ?>login.php" class="text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium">تسجيل الدخول</a>
@@ -95,6 +119,20 @@ $base_path = $is_subdir ? '../' : '';
         </div>
     </div>
 </header>
+
+<?php
+// Load notification system for logged-in users
+if (is_logged_in()): ?>
+<script src="<?php echo $base_path; ?>assets/js/notifications.js"></script>
+<style>
+.notification-item.unread {
+    background-color: #eff6ff;
+}
+.notification-item:hover {
+    background-color: #f9fafb;
+}
+</style>
+<?php endif; ?>
 
 <?php
 // This section is no longer needed as styles are handled by Tailwind on each page

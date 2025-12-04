@@ -37,8 +37,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = 'يرجى ملء جميع الحقول المطلوبة';
         } else {
             try {
-                $stmt = $conn->prepare("UPDATE hospitals SET name = ?, phone = ?, address = ?, description = ? WHERE id = ?");
-                $stmt->execute([$name, $phone, $address, $description, $hospital_id]);
+                // Handle Image Upload
+                $image_path = null;
+                if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                    $filename = $_FILES['image']['name'];
+                    $filetype = pathinfo($filename, PATHINFO_EXTENSION);
+                    if (in_array(strtolower($filetype), $allowed)) {
+                        $new_filename = uniqid() . '.' . $filetype;
+                        $upload_dir = '../assets/images/hospitals/';
+                        if (!is_dir($upload_dir)) {
+                            mkdir($upload_dir, 0777, true);
+                        }
+                        if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
+                            $image_path = 'assets/images/hospitals/' . $new_filename;
+                        }
+                    }
+                }
+
+                // Update hospitals table
+                $sql = "UPDATE hospitals SET name = ?, phone = ?, address = ?, description = ?";
+                $params = [$name, $phone, $address, $description];
+                
+                if ($image_path) {
+                    $sql .= ", image = ?";
+                    $params[] = $image_path;
+                }
+                
+                $sql .= " WHERE id = ?";
+                $params[] = $hospital_id;
+                
+                $stmt = $conn->prepare($sql);
+                $stmt->execute($params);
+
+                // Update users table (full_name) to sync with hospital name
+                $stmt = $conn->prepare("UPDATE users SET full_name = ? WHERE id = ?");
+                $stmt->execute([$name, $user_id]);
+
+                // Update session variable immediately
+                $_SESSION['user_name'] = $name;
+
                 $success = 'تم تحديث معلومات المستشفى بنجاح';
                 
                 // Refresh hospital data
@@ -132,8 +170,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <h3 class="text-2xl font-bold text-gray-900">معلومات المستشفى</h3>
             </div>
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="space-y-6">
+                    <!-- Image Upload -->
+                    <div class="flex items-center gap-6">
+                        <div class="relative">
+                            <?php if (!empty($hospital['image'])): ?>
+                                <img src="../<?php echo htmlspecialchars($hospital['image']); ?>" alt="Hospital Logo" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
+                            <?php else: ?>
+                                <div class="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center border-4 border-white shadow-lg">
+                                    <i class="fas fa-hospital text-3xl text-blue-500"></i>
+                                </div>
+                            <?php endif; ?>
+                            <label for="image" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-md cursor-pointer hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-camera text-sm"></i>
+                                <input type="file" id="image" name="image" accept="image/*" class="hidden">
+                            </label>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">شعار المستشفى</h4>
+                            <p class="text-sm text-gray-500">JPG, GIF or PNG. Max size of 2MB</p>
+                        </div>
+                    </div>
+
                     <div>
                         <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">اسم المستشفى *</label>
                         <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($hospital['name']); ?>"

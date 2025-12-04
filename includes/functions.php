@@ -819,7 +819,7 @@ function search_doctors($search_query, $specialty_id)
                 d.id,
                 d.full_name,
                 d.image,
-                d.rating,
+                d.calculated_rating as rating,
                 s.name as specialty_name,
                 c.name as clinic_name,
                 c.address as clinic_address
@@ -842,7 +842,7 @@ function search_doctors($search_query, $specialty_id)
     }
 
     try {
-        $sql .= " ORDER BY d.rating DESC";
+        $sql .= " ORDER BY d.calculated_rating DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
@@ -925,7 +925,7 @@ function get_all_doctors_by_rating($conn)
                 d.id,
                 d.full_name,
                 d.image,
-                d.rating,
+                d.calculated_rating as rating,
                 d.consultation_fee,
                 d.experience_years,
                 d.education,
@@ -937,7 +937,7 @@ function get_all_doctors_by_rating($conn)
             LEFT JOIN specialties s ON d.specialty_id = s.id
             LEFT JOIN clinics c ON d.clinic_id = c.id
             LEFT JOIN hospitals h ON d.hospital_id = h.id
-            ORDER BY d.rating DESC
+            ORDER BY d.calculated_rating DESC
         ");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -958,7 +958,7 @@ function get_all_doctors($limit = 10, $offset = 0)
                 d.id,
                 d.full_name,
                 d.image,
-                d.rating,
+                d.calculated_rating as rating,
                 s.name as specialty_name,
                 c.name as clinic_name,
                 c.address as clinic_address
@@ -2139,6 +2139,48 @@ function send_notification($user_id, $title, $message, $type = 'system')
         return true;
     } catch (PDOException $e) {
         error_log("Notification error: " . $e->getMessage());
+        return false;
+    }
+}
+
+// ====================================================================
+// APPOINTMENT REVIEW FUNCTIONS
+// ====================================================================
+
+/**
+ * Add or update an appointment review
+ */
+function add_appointment_review($appointment_id, $user_id, $rating, $comment = '') {
+    try {
+        $db = new Database();
+        $conn = $db->getConnection();
+        
+        $sql = "INSERT INTO appointment_reviews (appointment_id, user_id, rating, comment)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE rating = ?, comment = ?, updated_at = CURRENT_TIMESTAMP";
+        
+        $stmt = $conn->prepare($sql);
+        return $stmt->execute([$appointment_id, $user_id, $rating, $comment, $rating, $comment]);
+    } catch (PDOException $e) {
+        error_log("Add appointment review error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Get appointment review by appointment ID and user ID
+ */
+function get_appointment_review($appointment_id, $user_id) {
+    try {
+        $db = new Database();
+        $conn = $db->getConnection();
+        
+        $sql = "SELECT * FROM appointment_reviews WHERE appointment_id = ? AND user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$appointment_id, $user_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Get appointment review error: " . $e->getMessage());
         return false;
     }
 }

@@ -115,7 +115,10 @@ $featured_hospitals = array_slice(get_all_hospitals($conn), 0, 6);
                     <?php foreach ($doctors as $doctor): ?>
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 group">
                             <div class="relative">
-                                <img src="<?php echo htmlspecialchars($doctor['profile_image'] ?? 'assets/images/default-avatar.png'); ?>" alt="<?php echo htmlspecialchars($doctor['full_name']); ?>" class="w-full h-48 object-cover">
+                                <img src="<?php echo htmlspecialchars($doctor['image'] ?? 'assets/images/default-avatar.png'); ?>" 
+                                     alt="<?php echo htmlspecialchars($doctor['full_name']); ?>" 
+                                     class="w-full h-48 object-cover"
+                                     onerror="this.onerror=null; this.src='assets/images/default-avatar.png';">
                                 <div class="absolute top-4 right-4 bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                                     <?php echo htmlspecialchars($doctor['specialty_name']); ?>
                                 </div>
