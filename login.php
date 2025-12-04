@@ -25,8 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$user || !password_verify($password, $user['password'])) {
                 $error = 'اسم المستخدم أو كلمة المرور غير صحيحة';
             } else {
-                // Check if user is active
-                if (isset($user['is_active']) && $user['is_active'] == 0) {
+                // Check if user is verified
+                if (isset($user['is_verified']) && $user['is_verified'] == 0) {
+                    $error = 'يرجى تفعيل حسابك أولاً. <a href="verify_email.php?email=' . urlencode($email) . '">اضغط هنا للتفعيل</a>';
+                } elseif (isset($user['is_active']) && $user['is_active'] == 0) {
                     $error = 'حسابك معطل. يرجى التواصل مع الإدارة';
                 } else {
                     $_SESSION['user_id'] = $user['id'];

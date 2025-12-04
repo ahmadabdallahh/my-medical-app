@@ -6,6 +6,8 @@ if (session_status() == PHP_SESSION_NONE) {
 // Ensure the config file is included to have access to get_db_connection()
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/error_handler.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../config/mail.php';
 
 // ====================================================================
 // CONFIGURATION & CONSTANTS
@@ -2185,5 +2187,56 @@ function get_appointment_review($appointment_id, $user_id) {
     }
 }
 
-?>
 
+
+
+/**
+ * Send verification email using PHPMailer
+ * @param string $to_email
+ * @param string $verification_code
+ * @return bool
+ */
+function send_verification_email($to_email, $verification_code) {
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        //Server settings
+        $mail->isSMTP();
+        $mail->Host       = SMTP_HOST;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = SMTP_USERNAME;
+        $mail->Password   = SMTP_PASSWORD;
+        $mail->SMTPSecure = SMTP_SECURE;
+        $mail->Port       = SMTP_PORT;
+        $mail->CharSet    = 'UTF-8';
+
+        //Recipients
+        $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+        $mail->addAddress($to_email);
+
+        //Content
+        $mail->isHTML(true);
+        $mail->Subject = 'تفعيل حسابك في Health Tech';
+        $mail->Body    = "
+            <div dir='rtl' style='font-family: Tahoma, sans-serif; text-align: right; padding: 20px; background-color: #f9f9f9;'>
+                <div style='background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                    <h2 style='color: #333;'>مرحباً بك في Health Tech</h2>
+                    <p style='font-size: 16px; color: #555;'>شكراً لتسجيلك معنا. يرجى استخدام الرمز التالي لتفعيل حسابك:</p>
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <span style='background-color: #e3f2fd; color: #1976d2; padding: 15px 30px; font-size: 24px; font-weight: bold; border-radius: 4px; letter-spacing: 5px;'>{$verification_code}</span>
+                    </div>
+                    <p style='font-size: 14px; color: #777;'>إذا لم تقم بطلب هذا الرمز، يمكنك تجاهل هذا البريد الإلكتروني.</p>
+                </div>
+            </div>
+        ";
+        $mail->AltBody = "رمز التفعيل الخاص بك هو: {$verification_code}";
+
+        $mail->send();
+        return true;
+    } catch (\Throwable $e) {
+        $error_message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo} | Exception: " . $e->getMessage() . "\n";
+        error_log($error_message);
+        file_put_contents('C:/xampp/htdocs/medical-app-test/mail_debug.log', date('[Y-m-d H:i:s] ') . $error_message, FILE_APPEND);
+        return false;
+    }
+}

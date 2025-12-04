@@ -132,7 +132,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             } else {
                 $hashed_password = hash_password($password);
-                $stmt = $conn->prepare("INSERT INTO users (username, full_name, email, password, phone, gender, role) VALUES (:username, :name, :email, :password, :phone, :gender, :role)");
+                // Generate 6-digit verification code
+                $verification_code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                
+                $stmt = $conn->prepare("INSERT INTO users (username, full_name, email, password, phone, gender, role, verification_code, is_verified) VALUES (:username, :name, :email, :password, :phone, :gender, :role, :code, 0)");
 
                 $stmt->execute([
                     ':username' => $form_data['username'],
@@ -141,7 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     ':password' => $hashed_password,
                     ':phone' => $form_data['phone'],
                     ':gender' => $form_data['gender'],
-                    ':role' => $form_data['user_type']
+                    ':role' => $form_data['user_type'],
+                    ':code' => $verification_code
                 ]);
 
                 if ($stmt->rowCount()) {
@@ -155,10 +159,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             error_log("Error creating hospital record: " . $e->getMessage());
                         }
                     }
-                    $success = 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.';
-                    foreach ($form_data as $key => $value) {
-                        $form_data[$key] = '';
+                    
+                    
+                    // Send verification email
+                    if (!send_verification_email($form_data['email'], $verification_code)) {
+                        error_log("Failed to send verification email to " . $form_data['email']);
                     }
+
+                    // Redirect to verification page
+                    header("Location: verify_email.php?email=" . urlencode($form_data['email']));
+                    exit;
                 } else {
                     $errors['general'] = 'حدث خطأ أثناء إنشاء الحساب.';
                 }
