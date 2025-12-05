@@ -131,6 +131,9 @@ $days_arabic = [
                 </div>
 
                 <div class="flex items-center space-x-4 space-x-reverse">
+                    <button id="openSidebar" class="md:hidden p-2 text-gray-600 hover:text-blue-600" aria-label="Toggle Menu">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                     <span class="text-gray-600">
                         <i class="fas fa-user-md text-blue-600 ml-2"></i>
                         د. <?php echo htmlspecialchars($doctor_name); ?>
@@ -148,8 +151,10 @@ $days_arabic = [
 
     <!-- Sidebar and Main Content -->
     <div class="flex">
+        <!-- Mobile Sidebar Overlay -->
+        <div id="doctorOverlay" class="fixed inset-0 bg-black/40 hidden z-40 md:hidden"></div>
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg min-h-screen">
+        <aside id="doctorSidebar" class="fixed inset-y-0 right-0 w-72 bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50 md:static md:translate-x-0 md:w-64 md:shadow-lg min-h-screen">
             <div class="p-4">
                 <h3 class="text-lg font-bold text-gray-800 mb-6">لوحة التحكم</h3>
 
@@ -188,7 +193,7 @@ $days_arabic = [
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
             <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900">إدارة مواعيد العمل</h1>
@@ -231,17 +236,23 @@ $days_arabic = [
             <?php else: ?>
 
                 <!-- Availability Form -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">مواعيد العمل الأسبوعية</h2>
-
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">إضافة وقت عمل جديد</h2>
+                    
                     <form method="POST" action="" class="space-y-6">
-                        <!-- Slot Duration -->
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-clock ml-2"></i>
-                                مدة كل موعد (بالدقائق)
-                            </label>
-                            <select name="slot_duration" class="w-full md:w-48 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-clock ml-2"></i>
+                                    مدة كل موعد (بالدقائق)
+                                </label>
+                                <select name="slot_duration" class="w-full md:w-48 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="15" <?php echo $default_slot_duration == 15 ? 'selected' : ''; ?>>15 دقيقة</option>
+                                    <option value="30" <?php echo $default_slot_duration == 30 ? 'selected' : ''; ?>>30 دقيقة</option>
+                                    <option value="45" <?php echo $default_slot_duration == 45 ? 'selected' : ''; ?>>45 دقيقة</option>
+                                    <option value="60" <?php echo $default_slot_duration == 60 ? 'selected' : ''; ?>>60 دقيقة</option>
+                                </select>
+                            </div>
                                 <option value="15" <?php echo $default_slot_duration == 15 ? 'selected' : ''; ?>>15 دقيقة</option>
                                 <option value="30" <?php echo $default_slot_duration == 30 ? 'selected' : ''; ?>>30 دقيقة</option>
                                 <option value="45" <?php echo $default_slot_duration == 45 ? 'selected' : ''; ?>>45 دقيقة</option>
@@ -286,7 +297,7 @@ $days_arabic = [
                                         <?php endif; ?>
                                     </div>
 
-                                    <div id="<?php echo $day_en; ?>_times" class="grid grid-cols-1 md:grid-cols-2 gap-4 <?php echo $is_enabled ? '' : 'opacity-50 pointer-events-none'; ?>">
+                                    <div id="<?php echo $day_en; ?>_times" class="grid grid-cols-1 sm:grid-cols-2 gap-4 <?php echo $is_enabled ? '' : 'opacity-50 pointer-events-none'; ?>">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">وقت البدء</label>
                                             <input type="time"
@@ -319,22 +330,23 @@ $days_arabic = [
             <?php endif; ?>
 
             <!-- Quick Actions -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                <a href="/App-Demo/doctor/appointments.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
-                    <i class="fas fa-calendar-check text-blue-600 text-3xl mb-3"></i>
-                    <h3 class="font-semibold text-gray-900">عرض المواعيد</h3>
-                    <p class="text-gray-600 text-sm mt-2">شاهد جميع المواعيد المحجوزة</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
+                <a href="/App-Demo/doctor/appointments.php" class="bg-white rounded-xl shadow-lg p-3 sm:p-6 hover:shadow-xl transition-shadow text-center">
+                    <i class="fas fa-calendar-check text-blue-600 text-2xl sm:text-3xl mb-2 sm:mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 text-sm sm:text-base">عرض المواعيد</h3>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 sm:mt-2">شاهد جميع المواعيد المحجوزة</p>
                 </a>
 
-                <a href="/App-Demo/doctor/index.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
-                    <i class="fas fa-arrow-left text-blue-600 text-3xl mb-3"></i>
-                    <h3 class="font-semibold text-gray-900">العودة للرئيسية</h3>
-                    <p class="text-gray-600 text-sm mt-2">لوحة تحكم الدكتور</p>
+                <a href="/App-Demo/doctor/index.php" class="bg-white rounded-xl shadow-lg p-3 sm:p-6 hover:shadow-xl transition-shadow text-center">
+                    <i class="fas fa-arrow-left text-blue-600 text-2xl sm:text-3xl mb-2 sm:mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 text-sm sm:text-base">العودة للرئيسية</h3>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 sm:mt-2">لوحة تحكم الدكتور</p>
                 </a>
             </div>
         </main>
     </div>
 
+    </body>
     <script>
         function toggleDay(day) {
             const checkbox = document.getElementById(day + '_enabled');
@@ -354,8 +366,37 @@ $days_arabic = [
                 toggleDay(day);
             });
         });
+
+        // Mobile drawer sidebar controls
+        (function() {
+            const openBtn = document.getElementById('openSidebar');
+            const sidebar = document.getElementById('doctorSidebar');
+            const overlay = document.getElementById('doctorOverlay');
+
+            function openDrawer(){
+                if(sidebar){ sidebar.classList.remove('translate-x-full'); }
+                if(overlay){ overlay.classList.remove('hidden'); }
+                document.body.classList.add('overflow-hidden');
+            }
+            function closeDrawer(){
+                if(sidebar){ sidebar.classList.add('translate-x-full'); }
+                if(overlay){ overlay.classList.add('hidden'); }
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            if(openBtn){ openBtn.addEventListener('click', openDrawer); }
+            if(overlay){ overlay.addEventListener('click', closeDrawer); }
+            document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeDrawer(); }});
+
+            // Close drawer when clicking sidebar links on mobile
+            const sidebarLinks = sidebar?.querySelectorAll('a');
+            if(sidebarLinks){
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        if(window.innerWidth < 768){ closeDrawer(); }
+                    });
+                });
+            }
+        })();
     </script>
-
-</body>
-
 </html>

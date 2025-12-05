@@ -118,6 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                 </div>
                 
                 <div class="flex items-center space-x-4 space-x-reverse">
+                    <button id="openSidebar" class="md:hidden p-2 text-gray-600 hover:text-blue-600" aria-label="Toggle Menu">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                     <span class="text-gray-600">
                         <i class="fas fa-user-md text-blue-600 ml-2"></i>
                         د. <?php echo htmlspecialchars($doctor_name); ?>
@@ -135,8 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
 
     <!-- Sidebar and Main Content -->
     <div class="flex">
+        <!-- Mobile Sidebar Overlay -->
+        <div id="doctorOverlay" class="fixed inset-0 bg-black/40 hidden z-40 md:hidden"></div>
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg min-h-screen">
+        <aside id="doctorSidebar" class="fixed inset-y-0 right-0 w-72 bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50 md:static md:translate-x-0 md:w-64 md:shadow-lg min-h-screen">
             <div class="p-4">
                 <h3 class="text-lg font-bold text-gray-800 mb-6">لوحة التحكم</h3>
                 
@@ -175,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
             <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900">المواعيد</h1>
@@ -183,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
             </div>
 
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
                 <?php
                 $today_count = 0;
                 $upcoming_count = 0;
@@ -198,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                 }
                 ?>
                 
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-blue-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">موعد اليوم</p>
@@ -210,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-green-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">قادم</p>
@@ -222,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-purple-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">مكتمل</p>
@@ -234,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-red-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">ملغي</p>
@@ -248,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
             </div>
 
             <!-- Appointments Table -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-bold text-gray-900">جميع المواعيد</h2>
                     <span class="text-gray-500">
@@ -258,34 +263,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                 
                 <?php if (!empty($appointments)): ?>
                     <div class="overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full text-sm sm:text-base">
                             <thead>
                                 <tr class="border-b bg-gray-50">
-                                    <th class="text-right py-3 px-4 font-semibold">المريض</th>
-                                    <th class="text-right py-3 px-4 font-semibold">التاريخ</th>
-                                    <th class="text-right py-3 px-4 font-semibold">الوقت</th>
-                                    <th class="text-right py-3 px-4 font-semibold">الحالة</th>
-                                    <th class="text-right py-3 px-4 font-semibold">ملاحظات</th>
-                                    <th class="text-right py-3 px-4 font-semibold">إجراءات</th>
+                                    <th class="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">المريض</th>
+                                    <th class="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">التاريخ</th>
+                                    <th class="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">الوقت</th>
+                                    <th class="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">الحالة</th>
+                                    <th class="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm hidden sm:table-cell">ملاحظات</th>
+                                    <th class="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">إجراءات</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($appointments as $appointment): ?>
                                     <tr class="border-b hover:bg-gray-50">
-                                        <td class="py-4 px-4">
+                                        <td class="py-2 sm:py-4 px-2 sm:px-4">
                                             <div>
-                                                <p class="font-semibold"><?php echo htmlspecialchars($appointment['patient_name'] ?? 'غير محدد'); ?></p>
-                                                <p class="text-sm text-gray-500"><?php echo htmlspecialchars($appointment['patient_email'] ?? ''); ?></p>
-                                                <p class="text-sm text-gray-500"><?php echo htmlspecialchars($appointment['patient_phone'] ?? ''); ?></p>
+                                                <p class="font-semibold text-xs sm:text-sm"><?php echo htmlspecialchars($appointment['patient_name'] ?? 'غير محدد'); ?></p>
+                                                <p class="text-xs text-gray-500 hidden sm:block"><?php echo htmlspecialchars($appointment['patient_email'] ?? ''); ?></p>
+                                                <p class="text-xs text-gray-500"><?php echo htmlspecialchars($appointment['patient_phone'] ?? ''); ?></p>
                                             </div>
                                         </td>
-                                        <td class="py-4 px-4">
-                                            <span class="font-medium"><?php echo $appointment['appointment_date']; ?></span>
+                                        <td class="py-2 sm:py-4 px-2 sm:px-4">
+                                            <span class="font-medium text-xs sm:text-sm"><?php echo $appointment['appointment_date']; ?></span>
                                         </td>
-                                        <td class="py-4 px-4">
-                                            <span class="font-medium"><?php echo $appointment['appointment_time']; ?></span>
+                                        <td class="py-2 sm:py-4 px-2 sm:px-4">
+                                            <span class="font-medium text-xs sm:text-sm"><?php echo $appointment['appointment_time']; ?></span>
                                         </td>
-                                        <td class="py-4 px-4">
+                                        <td class="py-2 sm:py-4 px-2 sm:px-4">
                                             <?php
                                             $status_class = '';
                                             $status_text = '';
@@ -307,17 +312,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
                                                     $status_text = 'غير محدد';
                                             }
                                             ?>
-                                            <span class="px-3 py-1 text-xs rounded-full <?php echo $status_class; ?>">
+                                            <span class="px-2 py-1 text-xs rounded-full <?php echo $status_class; ?>">
                                                 <?php echo $status_text; ?>
                                             </span>
                                         </td>
-                                        <td class="py-4 px-4">
-                                            <p class="text-sm text-gray-600"><?php echo htmlspecialchars($appointment['notes'] ?? 'لا توجد ملاحظات'); ?></p>
+                                        <td class="py-2 sm:py-4 px-2 sm:px-4 hidden sm:table-cell">
+                                            <p class="text-xs text-gray-600"><?php echo htmlspecialchars($appointment['notes'] ?? 'لا توجد ملاحظات'); ?></p>
                                         </td>
-                                        <td class="py-4 px-4">
+                                        <td class="py-2 sm:py-4 px-2 sm:px-4">
                                             <form method="POST" action="" class="inline">
                                                 <input type="hidden" name="appointment_id" value="<?php echo $appointment['id']; ?>">
-                                                <select name="status" class="text-sm p-1 border rounded" onchange="this.form.submit()">
+                                                <select name="status" class="text-xs sm:text-sm p-1 border rounded" onchange="this.form.submit()">
                                                     <option value="confirmed" <?php echo $appointment['status'] == 'confirmed' ? 'selected' : ''; ?>>مؤكد</option>
                                                     <option value="completed" <?php echo $appointment['status'] == 'completed' ? 'selected' : ''; ?>>تم</option>
                                                     <option value="cancelled" <?php echo $appointment['status'] == 'cancelled' ? 'selected' : ''; ?>>ملغي</option>
@@ -340,21 +345,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
             </div>
 
             <!-- Quick Actions -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                <a href="/App-Demo/doctor/availability.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
-                    <i class="fas fa-clock text-blue-600 text-3xl mb-3"></i>
-                    <h3 class="font-semibold text-gray-900">إدارة مواعيد العمل</h3>
-                    <p class="text-gray-600 text-sm mt-2">حدد أوقات توافرك للمرضى</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 mt-6 sm:mt-8">
+                <a href="/App-Demo/doctor/availability.php" class="bg-white rounded-xl shadow-lg p-3 sm:p-6 hover:shadow-xl transition-shadow text-center">
+                    <i class="fas fa-clock text-blue-600 text-2xl sm:text-3xl mb-2 sm:mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 text-sm sm:text-base">إدارة مواعيد العمل</h3>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 sm:mt-2">حدد أوقات توافرك للمرضى</p>
                 </a>
                 
-                <a href="/App-Demo/doctor/index.php" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
-                    <i class="fas fa-arrow-left text-blue-600 text-3xl mb-3"></i>
-                    <h3 class="font-semibold text-gray-900">العودة للرئيسية</h3>
-                    <p class="text-gray-600 text-sm mt-2">لوحة تحكم الدكتور</p>
+                <a href="/App-Demo/doctor/index.php" class="bg-white rounded-xl shadow-lg p-3 sm:p-6 hover:shadow-xl transition-shadow text-center">
+                    <i class="fas fa-arrow-left text-blue-600 text-2xl sm:text-3xl mb-2 sm:mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 text-sm sm:text-base">العودة للرئيسية</h3>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 sm:mt-2">لوحة تحكم الدكتور</p>
                 </a>
             </div>
         </main>
     </div>
 
 </body>
+    <script>
+      (function() {
+        const openBtn = document.getElementById('openSidebar');
+        const sidebar = document.getElementById('doctorSidebar');
+        const overlay = document.getElementById('doctorOverlay');
+
+        function openDrawer(){
+          if(sidebar){ sidebar.classList.remove('translate-x-full'); }
+          if(overlay){ overlay.classList.remove('hidden'); }
+          document.body.classList.add('overflow-hidden');
+        }
+        function closeDrawer(){
+          if(sidebar){ sidebar.classList.add('translate-x-full'); }
+          if(overlay){ overlay.classList.add('hidden'); }
+          document.body.classList.remove('overflow-hidden');
+        }
+
+        if(openBtn){ openBtn.addEventListener('click', openDrawer); }
+        if(overlay){ overlay.addEventListener('click', closeDrawer); }
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeDrawer(); }});
+
+        // Close drawer when clicking sidebar links on mobile
+        const sidebarLinks = sidebar?.querySelectorAll('a');
+        if(sidebarLinks){
+          sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+              if(window.innerWidth < 768){ closeDrawer(); }
+            });
+          });
+        }
+      })();
+    </script>
 </html>

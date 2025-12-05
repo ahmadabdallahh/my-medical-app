@@ -124,6 +124,9 @@ try {
                 </div>
 
                 <div class="flex items-center space-x-4 space-x-reverse">
+                    <button id="openSidebar" class="md:hidden p-2 text-gray-600 hover:text-blue-600" aria-label="Toggle Menu">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                     <span class="text-gray-600">
                         <i class="fas fa-user-md text-blue-600 ml-2"></i>
                         د. <?php echo htmlspecialchars($doctor_name); ?>
@@ -141,8 +144,10 @@ try {
 
     <!-- Sidebar and Main Content -->
     <div class="flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg min-h-screen">
+        <!-- Mobile Sidebar Overlay -->
+        <div id="doctorOverlay" class="fixed inset-0 bg-black/40 hidden z-40 md:hidden"></div>
+        <!-- Sidebar (mobile drawer + desktop static) -->
+        <aside id="doctorSidebar" class="fixed inset-y-0 right-0 w-72 bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50 md:static md:translate-x-0 md:w-64 md:shadow-lg min-h-screen">
             <div class="p-4">
                 <h3 class="text-lg font-bold text-gray-800 mb-6">لوحة التحكم</h3>
 
@@ -193,7 +198,7 @@ try {
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
             <!-- Welcome Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900">أهلاً بك، د. <?php echo htmlspecialchars($doctor_name); ?>
@@ -202,9 +207,9 @@ try {
             </div>
 
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
                 <!-- Today's Appointments -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-blue-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">مواعيد اليوم</p>
@@ -217,7 +222,7 @@ try {
                 </div>
 
                 <!-- Upcoming Appointments -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-green-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">المواعيد القادمة</p>
@@ -230,7 +235,7 @@ try {
                 </div>
 
                 <!-- Total Patients -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-purple-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">إجمالي المرضى</p>
@@ -243,7 +248,7 @@ try {
                 </div>
 
                 <!-- Rating -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-yellow-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">التقييم</p>
@@ -309,23 +314,23 @@ try {
             </div>
 
             <!-- Quick Actions -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8">
                 <a href="availability.php"
-                    class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
+                    class="bg-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow text-center">
                     <i class="fas fa-clock text-blue-600 text-3xl mb-3"></i>
                     <h3 class="font-semibold text-gray-900">إدارة مواعيد العمل</h3>
                     <p class="text-gray-600 text-sm mt-2">حدد أوقات توافرك</p>
                 </a>
 
                 <a href="profile.php"
-                    class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
+                    class="bg-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow text-center">
                     <i class="fas fa-user-edit text-blue-600 text-3xl mb-3"></i>
                     <h3 class="font-semibold text-gray-900">تعديل الملف الشخصي</h3>
                     <p class="text-gray-600 text-sm mt-2">حدث بياناتك ومعلوماتك</p>
                 </a>
 
                 <a href="../search.php"
-                    class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
+                    class="bg-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow text-center">
                     <i class="fas fa-search text-blue-600 text-3xl mb-3"></i>
                     <h3 class="font-semibold text-gray-900">البحث عن زملاء</h3>
                     <p class="text-gray-600 text-sm mt-2">ابحث عن أطباء آخرين</p>
@@ -334,6 +339,28 @@ try {
         </main>
     </div>
 
+    <script>
+      (function() {
+        const openBtn = document.getElementById('openSidebar');
+        const sidebar = document.getElementById('doctorSidebar');
+        const overlay = document.getElementById('doctorOverlay');
+
+        function openDrawer(){
+          if(sidebar){ sidebar.classList.remove('translate-x-full'); }
+          if(overlay){ overlay.classList.remove('hidden'); }
+          document.body.classList.add('overflow-hidden');
+        }
+        function closeDrawer(){
+          if(sidebar){ sidebar.classList.add('translate-x-full'); }
+          if(overlay){ overlay.classList.add('hidden'); }
+          document.body.classList.remove('overflow-hidden');
+        }
+
+        if(openBtn){ openBtn.addEventListener('click', openDrawer); }
+        if(overlay){ overlay.addEventListener('click', closeDrawer); }
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeDrawer(); }});
+      })();
+    </script>
 </body>
 
 </html>

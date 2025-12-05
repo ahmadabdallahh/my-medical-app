@@ -255,28 +255,93 @@ foreach ($upcoming_appointments as $appointment) {
         </main>
     </div>
 
+    <!-- Mobile Sidebar -->
+    <div id="sidebar" class="fixed inset-y-0 right-0 w-64 bg-white shadow-xl transform translate-x-full lg:translate-x-0 lg:relative lg:w-64 z-40 transition-transform duration-300 ease-in-out">
+        <div class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="index.php" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                        <i class="fas fa-home w-5"></i>
+                        <span>لوحة التحكم</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="appointments.php" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i class="far fa-calendar-alt w-5"></i>
+                        <span>المواعيد</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="profile.php" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i class="far fa-user w-5"></i>
+                        <span>الملف الشخصي</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i class="far fa-comment-dots w-5"></i>
+                        <span>الرسائل</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
     <!-- Mobile Sidebar Overlay -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-30 z-30 hidden lg:hidden transition-opacity duration-300"></div>
 
     <script>
         // Mobile sidebar toggle
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        let isSidebarOpen = false;
+
+        function toggleSidebar() {
+            isSidebarOpen = !isSidebarOpen;
+            if (isSidebarOpen) {
+                sidebar.classList.remove('translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+                // Add a small delay to allow the display: block to take effect before starting the opacity transition
+                setTimeout(() => {
+                    sidebarOverlay.classList.add('opacity-100');
+                }, 10);
+            } else {
+                sidebar.classList.add('translate-x-full');
+                sidebarOverlay.classList.remove('opacity-100');
+                // Wait for the opacity transition to complete before hiding the overlay
+                setTimeout(() => {
+                    if (!isSidebarOpen) {
+                        sidebarOverlay.classList.add('hidden');
+                    }
+                }, 300);
+            }
+        }
 
         if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('hidden');
-                sidebarOverlay.classList.toggle('hidden');
-            });
+            sidebarToggle.addEventListener('click', toggleSidebar);
         }
 
         if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
-                sidebar.classList.add('hidden');
-                sidebarOverlay.classList.add('hidden');
-            });
+            sidebarOverlay.addEventListener('click', toggleSidebar);
         }
+
+        // Close sidebar when clicking on a menu item (for mobile)
+        const menuItems = document.querySelectorAll('#sidebar a');
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth < 1024) { // Only for mobile
+                    toggleSidebar();
+                }
+            });
+        });
+
+        // Close sidebar when pressing Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isSidebarOpen) {
+                toggleSidebar();
+            }
+        });
     </script>
 </body>
 </html>

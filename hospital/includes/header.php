@@ -3,9 +3,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once '../config.php';
-require_once '../config/database.php';
-require_once '../includes/functions.php';
+// Get the root directory path
+$root_dir = dirname(dirname(__DIR__));
+
+// Include required files with absolute paths
+require_once $root_dir . '/config.php';
+require_once $root_dir . '/config/database.php';
+require_once $root_dir . '/includes/functions.php';
 
 // Check if user is logged in and is a hospital
 if (!is_logged_in() || $_SESSION['user_type'] !== 'hospital') {
